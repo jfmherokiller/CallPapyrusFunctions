@@ -2,12 +2,13 @@
 
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
-
-#ifdef NDEBUG
+#include "quickjs.h"
+#include "quickjs-libc.h"
+#include "storage/quickjs-storage.h"
+#include "PluginsFuncts.h"
+#include <Windows.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#else
 #include <spdlog/sinks/msvc_sink.h>
-#endif
 
 using namespace std::literals;
 

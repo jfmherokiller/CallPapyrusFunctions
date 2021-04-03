@@ -7,6 +7,7 @@
   "dependencies": [
     "boost-atomic",
     "span-lite",
-    "spdlog"
+    "spdlog",
+    "boost-stl-interfaces"
   ]
 }

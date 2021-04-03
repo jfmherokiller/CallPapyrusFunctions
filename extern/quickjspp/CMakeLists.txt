@@ -1,50 +1,17 @@
-cmake_minimum_required(VERSION 3.18)
-
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
-
-# ---- Project ----
-
+cmake_minimum_required(VERSION 3.19)
+include(GNUInstallDirs)
 project(
-	ExampleProject
-	VERSION 1.0.0
-	LANGUAGES CXX
+	quickjs
+	LANGUAGES C
 )
-
-configure_file(
-	${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in
-	${CMAKE_CURRENT_BINARY_DIR}/version.rc
-	@ONLY
-)
-
-# ---- Include guards ----
-
-if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
-	message(
-		FATAL_ERROR
-			"In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
-)
-endif()
-
-# ---- Dependencies ----
-
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
-
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_STATIC_RUNTIME ON CACHE BOOL "")
-set(Boost_USE_DEBUG_RUNTIME ON)
-
 if (MSVC)
-add_compile_definitions(
-	_UNICODE
-	CONFIG_JSX
-	JS_STRICT_NAN_BOXING
-	CONFIG_BIGNUM
-	CONFIG_STORAGE
-)
+	add_compile_definitions(
+		_UNICODE
+        CONFIG_JSX
+        JS_STRICT_NAN_BOXING
+        CONFIG_BIGNUM
+        CONFIG_STORAGE
+	)
 	
 	set(COMPILE_OPTIONS_DEBUG
 		/Zc:inline-	# Keep unreferenced COMDAT
@@ -92,7 +59,7 @@ add_compile_definitions(
 		/external:W0
 		
 		/W4	# Warning level (all warnings)
-		/WX	# Warning level (warnings are errors)
+		/WX-# Warning level (warnings are errors)
 		/wd4146
         /wd4703
         /wd4100
@@ -117,70 +84,59 @@ add_compile_definitions(
 		"$<$<CONFIG:Release>:${LINK_OPTIONS_RELEASE}>"
 	)
 endif()
-
-add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
-add_subdirectory("extern/quickjspp" quickjspp)
-find_package(spdlog REQUIRED)
-
-# ---- Add source files ----
-
-set(headers
-	src/PCH.h
+add_subdirectory("storage/dybase" storagebit)
+set(sources ${sources}
+cutils.c
+libregexp.c
+libunicode.c
+quickjs.c
+quickjs-libc.c
+libbf.c
+storage/quickjs-storage.c
 )
-
-set(sources
-	src/main.cpp
-	src/PCH.cpp
-	src/UtilityFunctions.cpp
-	src/jssetup.cpp
-	src/Mycommand.cpp
+set(headers ${headers}
+cutils.h
+libregexp.h
+libregexp-opcode.h
+libunicode.h
+libunicode-table.h
+list.h
+quickjs.h
+quickjs-atom.h
+quickjs-libc.h
+quickjs-opcode.h
+quickjs-jsx.h
+storage/quickjs-storage.h
 )
-
+add_compile_definitions(
+_CRT_SECURE_NO_WARNINGS
+JS_STRICT_NAN_BOXING
+CONFIG_BIGNUM
+CONFIG_STORAGE
+CONFIG_JSX
+)
+add_library(
+	${PROJECT_NAME}
+	STATIC
+	${headers}
+	${sources}
+)
 source_group(
-	TREE ${CMAKE_CURRENT_SOURCE_DIR}
+	TREE
+		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
 		${headers}
 		${sources}
 )
-
-# ---- Create DLL ----
-
-add_library(${PROJECT_NAME} SHARED
-	${headers}
-	${sources}
-	${CMAKE_CURRENT_BINARY_DIR}/version.rc
-	.clang-format
-)
-
-target_compile_features(${PROJECT_NAME}
+target_include_directories(
+	${PROJECT_NAME}
 	PUBLIC
-		cxx_std_17
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
-
-target_compile_options(${PROJECT_NAME}
-	PRIVATE
-		"$<$<BOOL:${MSVC}>:/TP>"
-)
-
-target_include_directories(${PROJECT_NAME}
-	PRIVATE 
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:src>
-)
-
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC
-		CommonLibSSE::CommonLibSSE
-		spdlog::spdlog
-		quickjs::quickjs
+    storagelib::storagelib
 )
 
-target_link_options(${PROJECT_NAME}
-	PUBLIC
-		${LINK_OPTIONS_${CONFIG}}
-)
-
-target_precompile_headers(${PROJECT_NAME}
-	PRIVATE
-		src/PCH.h
-)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
