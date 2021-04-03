@@ -21,14 +21,14 @@ void EvalateJsExpression(RE::StaticFunctionTag*,RE::BSFixedString expression)
 	JSContext* ctx;
 	rt = JS_NewRuntime();
 	if (!rt) {
-		fprintf(stderr, "qjs: cannot allocate JS runtime\n");
+		PrintStringToConsoleFile("qjs: cannot allocate JS runtime\n");
 		exit(2);
 	}
 	js_std_set_worker_new_context_func(JS_NewCustomContext);
 	js_std_init_handlers(rt);
 	ctx = JS_NewCustomContext(rt);
 	if (!ctx) {
-		fprintf(stderr, "qjs: cannot allocate JS context\n");
+		PrintStringToConsoleFile("qjs: cannot allocate JS context\n");
 		exit(2);
 	}
 
