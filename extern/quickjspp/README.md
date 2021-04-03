@@ -1,6 +1,7 @@
 
 
 # QuickJS Javascript Engine 
+Original source: https://github.com/c-smile/quickjspp
 
 Authors: Fabrice Bellard and Charlie Gordon
 
