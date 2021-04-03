@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.20)
 
+# ---- Cache build vars ----
+
+set(Boost_USE_STATIC_RUNTIME OFF CACHE BOOL "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
@@ -24,7 +27,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 	message(
 		FATAL_ERROR
 			"In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
-)
+	)
 endif()
 
 # ---- Dependencies ----
@@ -45,26 +48,15 @@ add_compile_definitions(
 	CONFIG_BIGNUM
 	CONFIG_STORAGE
 )
-	
-	set(COMPILE_OPTIONS_DEBUG
-		/Zc:inline-	# Keep unreferenced COMDAT
-		/JMC	# Just My Code debugging
-	)
-	
-	set(COMPILE_OPTIONS_RELEASE
-		/Zc:inline	# Remove unreferenced COMDAT
-		/JMC-	# Disable Just My Code debugging
-	)
 
 	add_compile_options(
-		/Gy	# Enable Function-Level Linking
 		/MP	# Build with Multiple Processes
-		/Oi	# Generate Intrinsic Functions
 		/sdl	# Enable Additional Security Checks
+		/utf-8	# Set Source and Executable character sets to UTF-8
 		/Zi	# Debug Information Format
-		
+
 		/permissive-	# Standards conformance
-		
+
 		/Zc:alignedNew	# C++17 over-aligned allocation
 		/Zc:auto	# Deduce Variable Type
 		/Zc:char8_t
@@ -86,40 +78,23 @@ add_compile_definitions(
 		/Zc:tlsGuards
 		/Zc:trigraphs	# Trigraphs Substitution
 		/Zc:wchar_t	# wchar_t Is Native Type
-		
+
 		/experimental:external
 		/external:anglebrackets
 		/external:W0
-		
+
 		/W4	# Warning level (all warnings)
 		/WX	# Warning level (warnings are errors)
-		/wd4146
-        /wd4703
-        /wd4100
-		"$<$<CONFIG:Debug>:${COMPILE_OPTIONS_DEBUG}>"
-		"$<$<CONFIG:Release>:${COMPILE_OPTIONS_RELEASE}>"
-	)
 
-	set(LINK_OPTIONS_DEBUG
-		/INCREMENTAL	# Link Incrementally
-		/OPT:NOREF	# Optimizations (keep functions/data never referenced)
-		/OPT:NOICF	# Optimizations (prevent identical COMDAT folding)
-	)
-	
-	set(LINK_OPTIONS_RELEASE
-		/INCREMENTAL:NO	# Link Incrementally
-		/OPT:REF	# Optimizations (eliminate functions/data never referenced)
-		/OPT:ICF	# Optimizations (perform identical COMDAT folding)
-	)
-
-	add_link_options(
-		"$<$<CONFIG:Debug>:${LINK_OPTIONS_DEBUG}>"
-		"$<$<CONFIG:Release>:${LINK_OPTIONS_RELEASE}>"
+		"$<$<CONFIG:DEBUG>:>"
+		"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC->"
 	)
 endif()
 
 add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
-find_package(spdlog REQUIRED)
+
+find_package(spdlog REQUIRED CONFIG)
+
 
 # ---- Add source files ----
 
@@ -137,7 +112,8 @@ set(sources
 )
 
 source_group(
-	TREE ${CMAKE_CURRENT_SOURCE_DIR}
+	TREE
+		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
 		${headers}
 		${sources}
@@ -145,42 +121,46 @@ source_group(
 
 # ---- Create DLL ----
 
-add_library(${PROJECT_NAME} SHARED
+add_library(
+	${PROJECT_NAME}
+	SHARED
 	${headers}
 	${sources}
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
 )
 
-target_compile_features(${PROJECT_NAME}
-	PUBLIC
-		cxx_std_17
-)
-
-target_compile_options(${PROJECT_NAME}
+target_compile_features(
+	${PROJECT_NAME}
 	PRIVATE
-		"$<$<BOOL:${MSVC}>:/TP>"
+		cxx_std_20
 )
 
-target_include_directories(${PROJECT_NAME}
-	PRIVATE 
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:src>
+target_include_directories(
+	${PROJECT_NAME}
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(${PROJECT_NAME}
-	PUBLIC
+target_link_libraries(
+	${PROJECT_NAME}
+	PRIVATE
 		CommonLibSSE::CommonLibSSE
 		spdlog::spdlog
 )
 
-target_link_options(${PROJECT_NAME}
-	PUBLIC
-		${LINK_OPTIONS_${CONFIG}}
-)
+if (MSVC)
+	target_link_options(
+		${PROJECT_NAME}
+		PRIVATE
+			"$<$<CONFIG:DEBUG>:/INCREMENTAL;/OPT:NOREF;/OPT:NOICF>"
+			"$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
+	)
+endif()
 
-target_precompile_headers(${PROJECT_NAME}
+target_precompile_headers(
+	${PROJECT_NAME}
 	PRIVATE
 		src/PCH.h
 )
-set(VS_STARTUP_PROJECT ExampleProject)
+set(VS_STARTUP_PROJECT CallPaparusFunctions)
