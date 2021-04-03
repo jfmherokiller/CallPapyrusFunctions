@@ -6,9 +6,11 @@
 #include "quickjs-libc.h"
 #include "storage/quickjs-storage.h"
 #include "PluginsFuncts.h"
-#include <Windows.h>
 #include <spdlog/sinks/basic_file_sink.h>
+
+#ifndef NDEBUG
 #include <spdlog/sinks/msvc_sink.h>
+#endif
 
 using namespace std::literals;
 
