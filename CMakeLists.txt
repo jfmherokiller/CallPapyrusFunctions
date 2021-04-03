@@ -184,3 +184,4 @@ target_precompile_headers(${PROJECT_NAME}
 	PRIVATE
 		src/PCH.h
 )
+set(VS_STARTUP_PROJECT ExampleProject)
