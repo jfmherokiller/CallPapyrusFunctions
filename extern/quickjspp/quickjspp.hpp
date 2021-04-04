@@ -1440,7 +1440,11 @@ public:
 
     /** returns current exception associated with context, and resets it. Should be called when qjs::exception is caught */
     Value getException() { return Value{ctx, JS_GetException(ctx)}; }
-
+	void AddIntrinsicBigFloat() { JS_AddIntrinsicBigFloat(ctx); }
+	void AddIntrinsicBigDecimal() { JS_AddIntrinsicBigDecimal(ctx); }
+	void AddIntrinsicOperators() { JS_AddIntrinsicOperators(ctx); }
+	void EnableBignumExt(int enable) { JS_EnableBignumExt(ctx, enable); }
+	
     /** Register class T for conversions to/from std::shared_ptr<T> to work.
      * Wherever possible module.class_<T>("T")... should be used instead.
      * @tparam T class type
@@ -1455,7 +1459,7 @@ public:
 
     Value eval(std::string_view buffer, const char * filename = "<eval>", unsigned eval_flags = 0)
     {
-        assert(buffer.data()[buffer.size()] == '\0' && "eval buffer is not null-terminated"); // JS_Eval requirement
+        assert(buffer[buffer.size()] == '\0' && "eval buffer is not null-terminated"); // JS_Eval requirement
         JSValue v = JS_Eval(ctx, buffer.data(), buffer.size(), filename, eval_flags);
         return Value{ctx, v};
     }
