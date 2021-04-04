@@ -1,13 +1,15 @@
 #include "quickjspp.hpp"
 
-class myJSInstance
+
+
+myJSInstance::myJSInstance():
+	mycontext(runtime)
 {
-private:
-	qjs::Runtime runtime;
-	qjs::Context mycontext;
-public:
-	myJSInstance():mycontext(runtime)
-	{
-		
-	}
-};
+}
+
+void myJSInstance::RemakeRuntime()
+{
+	runtime = qjs::Runtime();
+	mycontext = qjs::Context(runtime);
+	
+}
