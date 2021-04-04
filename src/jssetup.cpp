@@ -55,7 +55,7 @@ extern int eval_buf(JSContext* ctx, const char* buf, size_t buf_len,
 {
     JSValue val;
     int ret;
-
+	char* output;
     if ((eval_flags & JS_EVAL_TYPE_MASK) == JS_EVAL_TYPE_MODULE) {
         /* for the modules, we compile then run to be able to set
            import.meta */
@@ -70,7 +70,9 @@ extern int eval_buf(JSContext* ctx, const char* buf, size_t buf_len,
         val = JS_Eval(ctx, buf, buf_len, filename, eval_flags);
     }
     if (JS_IsException(val)) {
-        js_std_dump_error(ctx);
+        output = js_std_dump_error_buffer(ctx);
+		PrintStringToConsoleFile(output);
+		free(output);
         ret = -1;
     }
     else {

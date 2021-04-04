@@ -45,7 +45,7 @@ void EvalateJsExpression(RE::StaticFunctionTag*,RE::BSFixedString expression)
 	eval_buf(ctx, str.c_str(), strlen(str.c_str()), "<input>", JS_EVAL_TYPE_MODULE);
 	
 	eval_buf(ctx, expression.c_str(), strlen(expression.c_str()), "<cmdline>", JS_EVAL_TYPE_GLOBAL);
-	js_std_loop(ctx);
+	js_std_loop_buffer(ctx,PrintStringToConsoleFileFree);
 	js_std_free_handlers(rt);
 	JS_FreeContext(ctx);
 	JS_FreeRuntime(rt);
