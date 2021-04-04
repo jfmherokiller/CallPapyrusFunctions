@@ -2101,8 +2101,24 @@ static JSClassDef js_os_timer_class = {
     "OSTimer",
     .finalizer = js_os_timer_finalizer,
     .gc_mark = js_os_timer_mark,
-}; 
+};
 
+char* js_std_dump_error_buffer(JSContext* ctx);
+
+static char* call_handler_buffer(JSContext* ctx, JSValueConst func)
+{
+    JSValue ret, func1;
+	char* out;
+    /* 'func' might be destroyed when calling itself (if it frees the
+       handler), so must take extra care */
+    func1 = JS_DupValue(ctx, func);
+    ret = JS_Call(ctx, func1, JS_UNDEFINED, 0, NULL);
+    JS_FreeValue(ctx, func1);
+    if (JS_IsException(ret))
+		out = js_std_dump_error_buffer(ctx);
+    JS_FreeValue(ctx, ret);
+	return out;
+}
 static void call_handler(JSContext *ctx, JSValueConst func)
 {
     JSValue ret, func1;
@@ -3851,6 +3867,19 @@ void js_std_free_handlers(JSRuntime *rt)
     free(ts);
     JS_SetRuntimeOpaque(rt, NULL); /* fail safe */
 }
+static char* js_dump_obj_buffer(JSContext* ctx, FILE* f,JSValueConst val)
+{
+	const char* str = JS_ToCString(ctx, val);
+	int valuelen = strlen(str) + 2;
+	char* arr = (char*)malloc(valuelen * sizeof(char));
+	if (str) {
+		snprintf(arr, valuelen,"%s\n", str);
+		JS_FreeCString(ctx, str);
+	} else {
+		snprintf(arr,valuelen, "[exception]\n");
+	}
+	return arr;
+}
 
 static void js_dump_obj(JSContext *ctx, FILE *f, JSValueConst val)
 {
@@ -3863,6 +3892,43 @@ static void js_dump_obj(JSContext *ctx, FILE *f, JSValueConst val)
     } else {
         fprintf(f, "[exception]\n");
     }
+}
+
+static char* js_std_dump_error1_buffer(JSContext* ctx, JSValueConst exception_val)
+{
+	JSValue val;
+	BOOL is_error;
+	char* out;
+	char* out2;
+	char* out3;
+	is_error = JS_IsError(ctx, exception_val);
+	out = js_dump_obj_buffer(ctx, stderr, exception_val);
+	if (is_error) {
+		val = JS_GetPropertyStr(ctx, exception_val, "stack");
+		if (!JS_IsUndefined(val)) {
+			//setupStringConcat
+			int valuelen = strlen(out) + 1;
+			out2 = (char*)malloc(valuelen * sizeof(char));
+			//copyStr
+			strcpy(out2, out);
+			//release memory
+			free(out);
+			out = js_dump_obj_buffer(ctx, stderr, val);
+			//setup final copy
+			int valuelen2 = strlen(out) + 1;
+			out3 = (char*)malloc((valuelen + valuelen2 + 1) * sizeof(char));
+			//copy original string to out string
+			strcpy(out3, out2);
+			free(out2);
+			//copy new string to out string
+			strcat(out3, out);
+			free(out);
+			//assign out string to out variable
+			out = out3;
+		}
+		JS_FreeValue(ctx, val);
+	}
+	return out;
 }
 
 static void js_std_dump_error1(JSContext *ctx, JSValueConst exception_val)
@@ -3879,6 +3945,16 @@ static void js_std_dump_error1(JSContext *ctx, JSValueConst exception_val)
         }
         JS_FreeValue(ctx, val);
     }
+}
+
+char* js_std_dump_error_buffer(JSContext* ctx)
+{
+	JSValue exception_val;
+	char* out;
+	exception_val = JS_GetException(ctx);
+	out =js_std_dump_error1_buffer(ctx, exception_val);
+	JS_FreeValue(ctx, exception_val);
+	return out;
 }
 
 void js_std_dump_error(JSContext *ctx)
@@ -3922,7 +3998,28 @@ void js_std_loop(JSContext *ctx)
             break;
     }
 }
+void js_std_loop_buffer(JSContext* ctx, void (*errorHandler)(char*))
+{
+	JSContext* ctx1;
+	int err;
+	char* output;
+	for (;;) {
+		/* execute the pending jobs */
+		for (;;) {
+			err = JS_ExecutePendingJob(JS_GetRuntime(ctx), &ctx1);
+			if (err <= 0) {
+				if (err < 0) {
+					output = js_std_dump_error_buffer(ctx1);
+					errorHandler(output);
+				}
+				break;
+			}
+		}
 
+		if (!os_poll_func || os_poll_func(ctx))
+			break;
+	}
+}
 void js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
                         int load_only)
 {
