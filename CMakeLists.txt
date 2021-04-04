@@ -126,6 +126,7 @@ find_package(spdlog REQUIRED)
 
 set(headers
 	src/PCH.h
+	src/PluginsFuncts.h
 )
 
 set(sources
@@ -134,6 +135,7 @@ set(sources
 	src/UtilityFunctions.cpp
 	src/jssetup.cpp
 	src/Mycommand.cpp
+	src/JSInstance.cpp
 )
 
 source_group(

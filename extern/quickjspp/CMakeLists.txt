@@ -102,6 +102,7 @@ libunicode.h
 libunicode-table.h
 list.h
 quickjs.h
+quickjspp.hpp
 quickjs-atom.h
 quickjs-libc.h
 quickjs-opcode.h
