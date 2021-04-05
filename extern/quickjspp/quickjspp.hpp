@@ -1689,15 +1689,15 @@ property_proxy<Key>::operator Value() const
 	class Utility
 	{
 	public:
-		static void AddIntrinsicBigFloat(Context* ctx) { JS_AddIntrinsicBigFloat(ctx->ctx); }
-		static void AddIntrinsicBigDecimal(Context* ctx) { JS_AddIntrinsicBigDecimal(ctx->ctx); }
-		static void AddIntrinsicOperators(Context* ctx) { JS_AddIntrinsicOperators(ctx->ctx); }
-		static void EnableBignumExt(Context* ctx, int enable = 1) { JS_EnableBignumExt(ctx->ctx, enable); }
-		static void AddStdModule(Context* ctx, std::string name = "std") { js_init_module_std(ctx->ctx, name.c_str()); }
-		static void AddOsModule(Context* ctx, std::string name = "os") { js_init_module_os(ctx->ctx, name.c_str()); }
-		static void AddStorageModule(Context* ctx, std::string name = "storage") { js_init_module_storage(ctx->ctx, name.c_str()); }
+		static void AddIntrinsicBigFloat(JSContext* ctx) { JS_AddIntrinsicBigFloat(ctx); }
+		static void AddIntrinsicBigDecimal(JSContext* ctx) { JS_AddIntrinsicBigDecimal(ctx); }
+		static void AddIntrinsicOperators(JSContext* ctx) { JS_AddIntrinsicOperators(ctx); }
+		static void EnableBignumExt(JSContext* ctx, int enable = 1) { JS_EnableBignumExt(ctx, enable); }
+		static void AddStdModule(JSContext* ctx, std::string name = "std") { js_init_module_std(ctx, name.c_str()); }
+		static void AddOsModule(JSContext* ctx, std::string name = "os") { js_init_module_os(ctx, name.c_str()); }
+		static void AddStorageModule(JSContext* ctx, std::string name = "storage") { js_init_module_storage(ctx, name.c_str()); }
 
-		static void AddAllBaseParts(Context* ctx)
+		static void AddAllBaseParts(JSContext* ctx)
 		{
 			AddIntrinsicBigFloat(ctx);
 			AddIntrinsicBigDecimal(ctx);
