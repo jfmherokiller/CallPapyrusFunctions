@@ -50,9 +50,3 @@ void EvalateJsExpression(RE::StaticFunctionTag*,RE::BSFixedString expression)
 	JS_FreeContext(ctx);
 	JS_FreeRuntime(rt);
 }
-
-extern bool RegisterFuncs(RE::BSScript::Internal::VirtualMachine* a_registry)
-{
-	a_registry->RegisterFunction("EvalateJsExpression", "MyPluginScript", EvalateJsExpression);
-	return true;
-}

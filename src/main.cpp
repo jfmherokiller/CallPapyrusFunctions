@@ -7,7 +7,8 @@
 
 #endif
 	auto path = logger::log_directory();
-	if (!path) {
+	if (!path)
+	{
 		return false;
 	}
 
@@ -31,13 +32,15 @@
 	a_info->name = "MyFirstPlugin";
 	a_info->version = 1;
 
-	if (a_skse->IsEditor()) {
+	if (a_skse->IsEditor())
+	{
 		logger::critical("Loaded in editor, marking as incompatible"sv);
 		return false;
 	}
 
 	const auto ver = a_skse->RuntimeVersion();
-	if (ver < SKSE::RUNTIME_1_5_39) {
+	if (ver < SKSE::RUNTIME_1_5_39)
+	{
 		logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
 		return false;
 	}
@@ -45,15 +48,18 @@
 	return true;
 }
 
-
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
+	myJSInstance JsSetup;
+	spdlog::flush_every(std::chrono::seconds(5));
+
 	logger::info("MyFirstPlugin loaded");
 
 	SKSE::Init(a_skse);
 	logger::info("MyFirstPlugin loaded");
 	auto papyrus = SKSE::GetPapyrusInterface();
-	if (!papyrus->Register(RegisterFuncs)) {
+	if (!papyrus->Register(JsSetup.RegisterFuncts))
+	{
 		return false;
 	}
 	return true;
