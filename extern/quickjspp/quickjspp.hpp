@@ -1440,10 +1440,6 @@ public:
 
     /** returns current exception associated with context, and resets it. Should be called when qjs::exception is caught */
     Value getException() { return Value{ctx, JS_GetException(ctx)}; }
-	void AddIntrinsicBigFloat() { JS_AddIntrinsicBigFloat(ctx); }
-	void AddIntrinsicBigDecimal() { JS_AddIntrinsicBigDecimal(ctx); }
-	void AddIntrinsicOperators() { JS_AddIntrinsicOperators(ctx); }
-	void EnableBignumExt(int enable) { JS_EnableBignumExt(ctx, enable); }
 	
     /** Register class T for conversions to/from std::shared_ptr<T> to work.
      * Wherever possible module.class_<T>("T")... should be used instead.
