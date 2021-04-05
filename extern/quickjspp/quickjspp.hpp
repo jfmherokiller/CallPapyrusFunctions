@@ -1690,4 +1690,5 @@ property_proxy<Key>::operator Value() const
 }
 }
 
+		static void AddIntrinsicOperators(Context* ctx) { JS_AddIntrinsicOperators(ctx->ctx); }
 } // namespace qjs
