@@ -1455,7 +1455,7 @@ public:
 
     Value eval(std::string_view buffer, const char * filename = "<eval>", unsigned eval_flags = 0)
     {
-        assert(buffer[buffer.size()] == '\0' && "eval buffer is not null-terminated"); // JS_Eval requirement
+        //assert(buffer[buffer.size()] == '\0' && "eval buffer is not null-terminated"); // JS_Eval requirement
         JSValue v = JS_Eval(ctx, buffer.data(), buffer.size(), filename, eval_flags);
         return Value{ctx, v};
     }
