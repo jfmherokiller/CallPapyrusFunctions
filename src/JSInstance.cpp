@@ -35,7 +35,11 @@ void myJSInstance::EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString
 	try
 	{
 		auto returnedValue = mycontext->eval(expression.c_str(), "<cmdline>", JS_EVAL_TYPE_MODULE);
-		PrintStringToConsoleFile(static_cast<std::string>(returnedValue).data());
+		auto mstr = static_cast<std::string>(returnedValue);
+		if (mstr != "undefined")
+		{
+			PrintStringToConsoleFile(mstr);
+		}
 	}
 	catch (qjs::exception)
 	{
@@ -60,7 +64,7 @@ void myJSInstance::CustomModules()
 {
 	auto& custMod = mycontext->addModule("testmod");
 	custMod.function<&myJSInstance::TestFunct>("testme");
-	custMod.function <&PrintStringToConsoleFile>("printme");
+	custMod.function <&PrintStringToConsoleFile2>("printme");
 	mycontext->eval("import * as testmod from 'testmod'; globalThis.testmod = testmod; globalThis.printme = testmod.printme;", "<import>", JS_EVAL_TYPE_MODULE);
 	
 }
