@@ -20,7 +20,7 @@ void myJSInstance::ReinsertOSAndStd()
 {
 	auto myctx = mycontext->ctx;
 	qjs::Utility::AddAllBaseParts(myctx);
-	mycontext->eval(exposeOSAndStd, "<input>", JS_EVAL_TYPE_MODULE);
+	mycontext->eval(exposeOSAndStd.c_str(), "<input>", JS_EVAL_TYPE_MODULE);
 	CustomModules();
 }
 
@@ -60,6 +60,7 @@ void myJSInstance::CustomModules()
 {
 	auto& custMod = mycontext->addModule("testmod");
 	custMod.function<&myJSInstance::TestFunct>("testme");
-	mycontext->eval("import * as testmod from 'testmod'; globalThis.testmod = testmod;", "<import>", JS_EVAL_TYPE_MODULE);
+	custMod.function <&PrintStringToConsoleFile>("printme");
+	mycontext->eval("import * as testmod from 'testmod'; globalThis.testmod = testmod; globalThis.printme = testmod.printme;", "<import>", JS_EVAL_TYPE_MODULE);
 	
 }

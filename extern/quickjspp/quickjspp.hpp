@@ -1178,6 +1178,8 @@ public:
     Runtime()
     {
         rt = JS_NewRuntime();
+		js_std_init_handlers(rt);
+		JS_SetModuleLoaderFunc(rt, nullptr, js_module_loader, nullptr);
         if(!rt)
             throw std::runtime_error{"qjs: Cannot create runtime"};
     }
@@ -1187,6 +1189,7 @@ public:
 
     ~Runtime()
     {
+		js_std_free_handlers(rt);
         JS_FreeRuntime(rt);
     }
 };
