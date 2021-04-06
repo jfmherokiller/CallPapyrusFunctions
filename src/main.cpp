@@ -56,7 +56,6 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("MyFirstPlugin loaded");
 
 	SKSE::Init(a_skse);
-	logger::info("MyFirstPlugin loaded");
 	auto papyrus = SKSE::GetPapyrusInterface();
 	if (!papyrus->Register(JsSetup.RegisterFuncts))
 	{
