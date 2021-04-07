@@ -38,7 +38,7 @@ void myJSInstance::EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString
 		auto mstr = static_cast<std::string>(returnedValue);
 		if (mstr != "undefined")
 		{
-			PrintStringToConsoleFile(mstr);
+			PrintStringToConsoleFile(mstr.c_str());
 		}
 	}
 	catch (qjs::exception)
