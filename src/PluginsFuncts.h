@@ -23,6 +23,6 @@ public:
 	static void ReinsertOSAndStd();
 	static bool RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry);
 	static void EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString expression);
-	static void TestFunct();
+	void TestFunct(RE::StaticFunctionTag, RE::BSFixedString classfunct, RE::BSFixedString arglist);
 	static void CustomModules();
 };

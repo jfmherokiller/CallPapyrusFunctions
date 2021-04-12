@@ -71,12 +71,23 @@ void myJSInstance::TestFunct()
 	for (auto object_type : impvm->objectTypeMap) {
 		logger::info(object_type.first.data());
 	}
+void myJSInstance::TestFunct(RE::StaticFunctionTag,RE::BSFixedString classfunct,RE::BSFixedString arglist)
+{
+	
+	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+	auto ObjectMap = impvm->objectTypeMap;
+	std::vector<std::string> classfunctSplitParts = Splitter(classfunct.c_str(), '.');
+	std::vector<std::string> functionArgs = Splitter(arglist.c_str(), ',');
+	std::string className;
+	GetGlobalFunction(impvm, classfunctSplitParts,functionArgs.size());
+	impvm->DispatchStaticCall("", "", "", "");
 }
+
 
 void myJSInstance::CustomModules()
 {
 	auto& custMod = mycontext->addModule("testmod");
-	custMod.function<&myJSInstance::TestFunct>("testme");
+	//custMod.function<&myJSInstance::TestFunct>("testme");
 	custMod.function <&PrintStringToConsoleFile2>("printme");
 	mycontext->eval("import * as testmod from 'testmod'; globalThis.testmod = testmod; globalThis.printme = testmod.printme;", "<import>", JS_EVAL_TYPE_MODULE);
 	
