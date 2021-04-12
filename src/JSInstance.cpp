@@ -65,12 +65,24 @@ void myJSInstance::EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString
 	}
 }
 
-void myJSInstance::TestFunct()
+RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, int numArgs)
 {
-	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	for (auto object_type : impvm->objectTypeMap) {
-		logger::info(object_type.first.data());
+		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0)
+		{
+			auto objectInfo = object_type.second;
+			for (int index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index)
+			{
+				auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
+				if (globalFunct->func->GetParamCount() == numArgs)
+				{
+					return globalFunct;
+				}
+			}
+		}
 	}
+}
+
 void myJSInstance::TestFunct(RE::StaticFunctionTag,RE::BSFixedString classfunct,RE::BSFixedString arglist)
 {
 	
