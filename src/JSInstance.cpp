@@ -73,7 +73,7 @@ RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE
 			auto objectInfo = object_type.second;
 			for (int index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index)
 			{
-				auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
+				const auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
 				if (globalFunct->func->GetParamCount() == numArgs)
 				{
 					return globalFunct;
@@ -81,6 +81,7 @@ RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE
 			}
 		}
 	}
+	return nullptr;
 }
 
 void myJSInstance::TestFunct(RE::StaticFunctionTag,RE::BSFixedString classfunct,RE::BSFixedString arglist)
@@ -90,8 +91,8 @@ void myJSInstance::TestFunct(RE::StaticFunctionTag,RE::BSFixedString classfunct,
 	auto ObjectMap = impvm->objectTypeMap;
 	std::vector<std::string> classfunctSplitParts = Splitter(classfunct.c_str(), '.');
 	std::vector<std::string> functionArgs = Splitter(arglist.c_str(), ',');
-	std::string className;
-	GetGlobalFunction(impvm, classfunctSplitParts,functionArgs.size());
+	auto globalFunct  =GetGlobalFunction(impvm, classfunctSplitParts,functionArgs.size());
+	if (globalFunct == nullptr) return;
 	impvm->DispatchStaticCall("", "", "", "");
 }
 
