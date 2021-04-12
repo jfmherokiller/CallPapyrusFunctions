@@ -2,6 +2,19 @@
 
 qjs::Runtime* myJSInstance::runtime = new qjs::Runtime();
 qjs::Context* myJSInstance::mycontext = new qjs::Context(*runtime);
+
+
+std::vector<std::string> Splitter(std::string basetext, const char delim)
+{
+	std::string buf;				 // Have a buffer string
+	std::stringstream ss(basetext);	 // Insert the string into a stream
+
+	std::vector<std::string> tokens;  // Create vector to hold our words
+
+	while (getline(ss, buf, delim))
+		tokens.push_back(buf);
+	return tokens;
+}
 myJSInstance::myJSInstance()
 {
 	ReinsertOSAndStd();
