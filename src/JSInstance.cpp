@@ -71,9 +71,13 @@ RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index) {
 				const auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
-				if (globalFunct->func->GetParamCount() == numArgs) {
-					return globalFunct;
+				if (strcmp(globalFunct->func->GetName().c_str(),classfunctSplitParts.at(1).c_str()) == 0)
+				{
+					if (globalFunct->func->GetParamCount() == numArgs) {
+						return globalFunct;
+					}
 				}
+
 			}
 		}
 	}
