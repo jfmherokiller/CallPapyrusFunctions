@@ -127,6 +127,7 @@ find_package(spdlog REQUIRED)
 set(headers
 	src/PCH.h
 	src/PluginsFuncts.h
+	src/TypeHandling.hpp
 )
 
 set(sources

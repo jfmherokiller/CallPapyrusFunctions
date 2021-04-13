@@ -1,4 +1,6 @@
 #include "quickjspp.hpp"
+#include "TypeHandling.hpp"
+
 #include <any>
 #include <map>
 qjs::Runtime* myJSInstance::runtime = new qjs::Runtime();
@@ -89,7 +91,7 @@ std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::Obj
 	}
 	return ParamData;
 }
-bool stob(std::string s, bool throw_on_error = true)
+bool StringToBool(std::string s, bool throw_on_error = true)
 {
 	auto result = false;  // failure to assert is false
 
@@ -113,244 +115,249 @@ bool stob(std::string s, bool throw_on_error = true)
 RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct, std::vector<std::string> args)
 {
 	auto argvals = GetFunctArgs(globalFunct);
-	auto converted = std::vector<std::any>();
-	const auto functArgs = RE::MakeFunctionArguments();
-	if (argvals.size() == 0) {
+	auto* const functArgs = RE::MakeFunctionArguments();
+	RE::BSScript::TypeInfo typeValOne;
+	RE::BSScript::TypeInfo typeValtwo;
+	RE::BSScript::TypeInfo typeValthree;
+	std::string valStringOne;
+	std::string valStringTwo;
+	std::string valStringThree;
+	if (argvals.empty()) {
 		return RE::MakeFunctionArguments();
 	}
 	if (argvals.size() == 1) {
-		const auto typeValOne = argvals.at(0);
-		const auto valStringOne = args.at(0);
+		typeValOne = argvals.at(0);
+		valStringOne = args.at(0);
 		if (typeValOne.IsString()) {
-			return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne));
+			return RE::MakeFunctionArguments(BsString(valStringOne));
 		} else if (typeValOne.IsBool()) {
-			return RE::MakeFunctionArguments(stob(valStringOne));
+			return RE::MakeFunctionArguments(StringToBool(valStringOne));
 		} else if (typeValOne.IsFloat()) {
-			return RE::MakeFunctionArguments(std::stof(valStringOne));
+			return RE::MakeFunctionArguments(StringToFloat(valStringOne));
 		} else if (typeValOne.IsInt()) {
-			return RE::MakeFunctionArguments(std::stoi(valStringOne));
+			return RE::MakeFunctionArguments(StringToInt(valStringOne));
 		}
 	}
 	if (argvals.size() == 2) {
-		const auto typeValOne = argvals.at(0);
-		const auto typeValtwo = argvals.at(1);
-		const auto valStringOne = args.at(0);
-		const auto valStringTwo = args.at(1);
+		typeValOne = argvals.at(0);
+		typeValtwo = argvals.at(1);
+		valStringOne = args.at(0);
+		valStringTwo = args.at(1);
 		if (typeValOne.IsString()) {
 			if (typeValtwo.IsString()) {
-				return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), new RE::BSFixedString(valStringTwo));
+				return RE::MakeFunctionArguments(BsString(valStringOne), BsString(valStringTwo));
 			} else if (typeValtwo.IsBool()) {
-				return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), stob(valStringTwo));
+				return RE::MakeFunctionArguments(BsString(valStringOne), StringToBool(valStringTwo));
 			} else if (typeValtwo.IsFloat()) {
-				return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stof(valStringTwo));
+				return RE::MakeFunctionArguments(BsString(valStringOne), StringToFloat(valStringTwo));
 			} else if (typeValtwo.IsInt()) {
-				return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stoi(valStringTwo));
+				return RE::MakeFunctionArguments(BsString(valStringOne), StringToInt(valStringTwo));
 			}
 		} else if (typeValOne.IsBool()) {
 			if (typeValtwo.IsString()) {
-				return RE::MakeFunctionArguments(stob(valStringOne), new RE::BSFixedString(valStringTwo));
+				return RE::MakeFunctionArguments(StringToBool(valStringOne), BsString(valStringTwo));
 			} else if (typeValtwo.IsBool()) {
-				return RE::MakeFunctionArguments(stob(valStringOne), stob(valStringTwo));
+				return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToBool(valStringTwo));
 			} else if (typeValtwo.IsFloat()) {
-				return RE::MakeFunctionArguments(stob(valStringOne), std::stof(valStringTwo));
+				return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToFloat(valStringTwo));
 			} else if (typeValtwo.IsInt()) {
-				return RE::MakeFunctionArguments(stob(valStringOne), std::stoi(valStringTwo));
+				return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToInt(valStringTwo));
 			}
 		} else if (typeValOne.IsFloat()) {
 			if (typeValtwo.IsString()) {
-				return RE::MakeFunctionArguments(std::stof(valStringOne), new RE::BSFixedString(valStringTwo));
+				return RE::MakeFunctionArguments(StringToFloat(valStringOne), BsString(valStringTwo));
 			} else if (typeValtwo.IsBool()) {
-				return RE::MakeFunctionArguments(std::stof(valStringOne), stob(valStringTwo));
+				return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToBool(valStringTwo));
 			} else if (typeValtwo.IsFloat()) {
-				return RE::MakeFunctionArguments(std::stof(valStringOne), std::stof(valStringTwo));
+				return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToFloat(valStringTwo));
 			} else if (typeValtwo.IsInt()) {
-				return RE::MakeFunctionArguments(std::stof(valStringOne), std::stoi(valStringTwo));
+				return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToInt(valStringTwo));
 			}
 		} else if (typeValOne.IsInt()) {
 			if (typeValtwo.IsString()) {
-				return RE::MakeFunctionArguments(std::stoi(valStringOne), new RE::BSFixedString(valStringTwo));
+				return RE::MakeFunctionArguments(StringToInt(valStringOne), BsString(valStringTwo));
 			} else if (typeValtwo.IsBool()) {
-				return RE::MakeFunctionArguments(std::stoi(valStringOne), stob(valStringTwo));
+				return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToBool(valStringTwo));
 			} else if (typeValtwo.IsFloat()) {
-				return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stof(valStringTwo));
+				return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToFloat(valStringTwo));
 			} else if (typeValtwo.IsInt()) {
-				return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stoi(valStringTwo));
+				return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToInt(valStringTwo));
 			}
 		}
 	}
 	if (argvals.size() == 3) {
-		const auto typeValOne = argvals.at(0);
-		const auto typeValtwo = argvals.at(1);
-		const auto typeValthree= argvals.at(2);
-		const auto valStringOne = args.at(0);
-		const auto valStringTwo = args.at(1);
-		const auto valStringThree = args.at(2);
+		typeValOne = argvals.at(0);
+		typeValtwo = argvals.at(1);
+		typeValthree = argvals.at(2);
+		valStringOne = args.at(0);
+		valStringTwo = args.at(1);
+		valStringThree = args.at(2);
 		if (typeValOne.IsString()) {
 			if (typeValtwo.IsString()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), new RE::BSFixedString(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), BsString(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), new RE::BSFixedString(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), BsString(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), new RE::BSFixedString(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), BsString(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), new RE::BSFixedString(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), BsString(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsBool()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), stob(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToBool(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), stob(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToBool(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), stob(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToBool(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), stob(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToBool(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsFloat()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stof(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToFloat(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stof(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToFloat(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stof(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToFloat(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stof(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToFloat(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsInt()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stoi(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToInt(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stoi(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToInt(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stoi(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToInt(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(new RE::BSFixedString(valStringOne), std::stoi(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(BsString(valStringOne), StringToInt(valStringTwo), StringToInt(valStringThree));
 				}
 			}
 		} else if (typeValOne.IsBool()) {
 			if (typeValtwo.IsString()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), new RE::BSFixedString(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), BsString(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), new RE::BSFixedString(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), BsString(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), new RE::BSFixedString(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), BsString(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), new RE::BSFixedString(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), BsString(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsBool()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), stob(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToBool(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), stob(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToBool(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), stob(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToBool(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), stob(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToBool(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsFloat()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stof(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToFloat(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stof(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToFloat(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stof(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToFloat(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stof(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToFloat(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsInt()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stoi(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToInt(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stoi(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToInt(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stoi(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToInt(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(stob(valStringOne), std::stoi(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToBool(valStringOne), StringToInt(valStringTwo), StringToInt(valStringThree));
 				}
 			}
 		} else if (typeValOne.IsFloat()) {
 			if (typeValtwo.IsString()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), new RE::BSFixedString(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), BsString(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), new RE::BSFixedString(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), BsString(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), new RE::BSFixedString(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), BsString(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), new RE::BSFixedString(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), BsString(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsBool()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), stob(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToBool(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), stob(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToBool(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), stob(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToBool(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), stob(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToBool(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsFloat()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stof(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToFloat(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stof(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToFloat(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stof(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToFloat(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stof(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToFloat(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsInt()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stoi(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToInt(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stoi(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToInt(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stoi(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToInt(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stof(valStringOne), std::stoi(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToFloat(valStringOne), StringToInt(valStringTwo), StringToInt(valStringThree));
 				}
 			}
 		} else if (typeValOne.IsInt()) {
 			if (typeValtwo.IsString()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), new RE::BSFixedString(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), BsString(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), new RE::BSFixedString(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), BsString(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), new RE::BSFixedString(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), BsString(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), new RE::BSFixedString(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), BsString(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsBool()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), stob(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToBool(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), stob(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToBool(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), stob(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToBool(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), stob(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToBool(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsFloat()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stof(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToFloat(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stof(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToFloat(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stof(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToFloat(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stof(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToFloat(valStringTwo), StringToInt(valStringThree));
 				}
 			} else if (typeValtwo.IsInt()) {
 				if (typeValthree.IsString()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stoi(valStringTwo), new RE::BSFixedString(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToInt(valStringTwo), BsString(valStringThree));
 				} else if (typeValthree.IsBool()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stoi(valStringTwo), stob(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToInt(valStringTwo), StringToBool(valStringThree));
 				} else if (typeValthree.IsFloat()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stoi(valStringTwo), std::stof(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToInt(valStringTwo), StringToFloat(valStringThree));
 				} else if (typeValthree.IsInt()) {
-					return RE::MakeFunctionArguments(std::stoi(valStringOne), std::stoi(valStringTwo), std::stoi(valStringThree));
+					return RE::MakeFunctionArguments(StringToInt(valStringOne), StringToInt(valStringTwo), StringToInt(valStringThree));
 				}
 			}
 		}
@@ -361,11 +368,11 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 	//	if (typeVal.IsString()) {
 	//		converted.emplace_back(RE::BSFixedString(valString));
 	//	} else if (typeVal.IsBool()) {
-	//		converted.emplace_back(stob(valString));
+	//		converted.emplace_back(StringToBool(valString));
 	//	} else if (typeVal.IsFloat()) {
-	//		converted.emplace_back(std::stof(valString));
+	//		converted.emplace_back(StringToFloat(valString));
 	//	} else if (typeVal.IsInt()) {
-	//		converted.emplace_back(std::stoi(valString));
+	//		converted.emplace_back(StringToInt(valString));
 	//	}
 	//}
 	return functArgs;
