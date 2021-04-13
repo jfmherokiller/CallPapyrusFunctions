@@ -38,6 +38,8 @@ Bool Function ChoseCommandTable(string[] cmd)
 		MyPluginScript.EvalateJsExpression(cmd[1])
 	ElseIf(cmd[0] == "jseval2")
 		MyPluginScript.EvalateJsExpression("std.evalScript("+cmd[1]+")")
+	ElseIf(cmd[0] == "cgfm")
+		MyPluginScript.CallGlobalFunction(cmd[1],cmd[2])
 	endif
 	return bSuccess
 	
