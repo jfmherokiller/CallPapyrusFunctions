@@ -43,6 +43,7 @@ void myJSInstance::ReinsertOSAndStd()
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
 {
 	a_registry->RegisterFunction("EvalateJsExpression", "MyPluginScript", EvalateJsExpression);
+	a_registry->RegisterFunction("CallGlobalFunction", "MyPluginScript", CallGlobalFunction);
 	return true;
 }
 
@@ -377,7 +378,7 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 	//}
 	return functArgs;
 }
-void myJSInstance::TestFunct(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto ObjectMap = impvm->objectTypeMap;
