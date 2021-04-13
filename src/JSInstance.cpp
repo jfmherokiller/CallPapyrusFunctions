@@ -382,8 +382,14 @@ void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedStr
 {
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto ObjectMap = impvm->objectTypeMap;
-	std::vector<std::string> classfunctSplitParts = Splitter(classfunct.c_str(), '.');
-	std::vector<std::string> functionArgs = Splitter(arglist.c_str(), ',');
+	std::string classfunctStr = classfunct.c_str();
+	std::string arglistStr = arglist.c_str();
+	// Remove all double-quote characters
+	classfunctStr.erase(remove(classfunctStr.begin(), classfunctStr.end(), '\"'),classfunctStr.end());
+	arglistStr.erase(remove(arglistStr.begin(), arglistStr.end(), '\"'), arglistStr.end());
+
+	std::vector<std::string> classfunctSplitParts = Splitter(classfunctStr, '.');
+	std::vector<std::string> functionArgs = Splitter(arglistStr, ',');
 	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
