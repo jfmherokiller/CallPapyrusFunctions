@@ -26,6 +26,6 @@ public:
 	RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* GetGlobalFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs);
 	std::vector<RE::BSScript::TypeInfo> GetFunctArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct);
 	RE::BSScript::IFunctionArguments* ConvertArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct, std::vector<std::string> args);
-	void TestFunct(RE::StaticFunctionTag, RE::BSFixedString classfunct, RE::BSFixedString arglist);
+	void TestFunct(RE::StaticFunctionTag*, RE::BSFixedString classfunct, RE::BSFixedString arglist);
 	static void CustomModules();
 };

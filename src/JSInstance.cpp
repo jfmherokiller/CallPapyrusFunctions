@@ -377,7 +377,7 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 	//}
 	return functArgs;
 }
-void myJSInstance::TestFunct(RE::StaticFunctionTag, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::TestFunct(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto ObjectMap = impvm->objectTypeMap;
@@ -386,9 +386,9 @@ void myJSInstance::TestFunct(RE::StaticFunctionTag, RE::BSFixedString classfunct
 	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
-	ConvertArgs(globalFunct, functionArgs);
+	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
-	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), nullptr, aaaclass);
+	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
 
 
