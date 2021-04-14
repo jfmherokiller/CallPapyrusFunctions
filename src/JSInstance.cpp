@@ -367,19 +367,6 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 			}
 		}
 	}
-	//for (std::uint32_t paramindex = 0; paramindex < args.size(); ++paramindex) {
-	//	auto typeVal = argvals.at(paramindex);
-	//	auto valString = args.at(paramindex);
-	//	if (typeVal.IsString()) {
-	//		converted.emplace_back(RE::BSFixedString(valString));
-	//	} else if (typeVal.IsBool()) {
-	//		converted.emplace_back(StringToBool(valString));
-	//	} else if (typeVal.IsFloat()) {
-	//		converted.emplace_back(StringToFloat(valString));
-	//	} else if (typeVal.IsInt()) {
-	//		converted.emplace_back(StringToInt(valString));
-	//	}
-	//}
 	return functArgs;
 }
 void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
