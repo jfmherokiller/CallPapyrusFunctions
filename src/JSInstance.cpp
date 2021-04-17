@@ -6,8 +6,21 @@
 qjs::Runtime* myJSInstance::runtime = new qjs::Runtime();
 qjs::Context* myJSInstance::mycontext = new qjs::Context(*runtime);
 
+RE::TESForm* StringToForm(const std::string& formHex)
+{
+	const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
+	const auto RefTesting2 = RE::TESForm::LookupByID(Playerform);
+	return RefTesting2;
+}
+template <typename T>
+T* StringToForm(const std::string& formHex)
+{
+	const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
+	const auto RefTesting2 = RE::TESForm::LookupByID<T>(Playerform);
+	return RefTesting2;
+}
 
-std::vector<std::string> Splitter(std::string basetext, const char delim)
+std::vector<std::string> Splitter(const std::string& basetext, const char delim)
 {
 	std::string buf;				 // Have a buffer string
 	std::stringstream ss(basetext);	 // Insert the string into a stream
@@ -66,7 +79,7 @@ void myJSInstance::EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString
 
 RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
 {
-	for (auto object_type : impvm->objectTypeMap) {
+	for (const auto& object_type : impvm->objectTypeMap) {
 		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index) {
@@ -115,21 +128,26 @@ bool StringToBool(std::string s, bool throw_on_error = true)
 	return result;
 }
 
-bool myJSInstance::HandleSingleValue(std::vector<std::string> args, std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, std::string valStringOne, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleSingleValue(std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, std::string valStringOne, RE::BSScript::IFunctionArguments*& value1)
 {
-
 	if (typeValOne.IsString()) {
-		value1 = RE::MakeFunctionArguments(BsString(valStringOne));
+		value1 = RE::MakeFunctionArguments<RE::BSFixedString>(BsString(valStringOne));
 		return true;
 	} else if (typeValOne.IsBool()) {
-		value1 = RE::MakeFunctionArguments(StringToBool(valStringOne));
+		value1 = RE::MakeFunctionArguments<bool>(StringToBool(valStringOne));
 		return true;
 	} else if (typeValOne.IsFloat()) {
-		value1 = RE::MakeFunctionArguments(StringToFloat(valStringOne));
+		value1 = RE::MakeFunctionArguments<float>(StringToFloat(valStringOne));
 		return true;
 	} else if (typeValOne.IsInt()) {
-		value1 = RE::MakeFunctionArguments(StringToInt(valStringOne));
+		value1 = RE::MakeFunctionArguments<int>(StringToInt(valStringOne));
 		return true;
+	} else if(typeValOne.IsObject()) {
+		if (strcmp(typeValOne.GetTypeInfo()->GetName(), "Actor") == 0) {
+			auto pActorBase = StringToForm<RE::TESActorBase>(valStringOne);
+			value1 = RE::MakeFunctionArguments(pActorBase->AsReference()->GetTemplateActorBase());
+			return true;
+		}
 	}
 	return false;
 }
@@ -457,7 +475,7 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 		valStringThree = args.at(2);
 	}
 	if (argvals.size() == 1) {
-		HandleSingleValue(args, argvals, typeValOne, valStringOne, value1);
+		HandleSingleValue(argvals, typeValOne, valStringOne, value1);
 	}
 	if (argvals.size() == 2) {
 		HandleTwoValues(args, argvals, typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
