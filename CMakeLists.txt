@@ -119,7 +119,6 @@ add_compile_definitions(
 endif()
 
 add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
-add_subdirectory("extern/quickjspp" quickjspp)
 find_package(spdlog REQUIRED)
 
 # ---- Add source files ----
@@ -134,8 +133,6 @@ set(sources
 	src/main.cpp
 	src/PCH.cpp
 	src/UtilityFunctions.cpp
-	src/jssetup.cpp
-	src/Mycommand.cpp
 	src/JSInstance.cpp
 )
 
@@ -175,7 +172,6 @@ target_link_libraries(${PROJECT_NAME}
 	PUBLIC
 		CommonLibSSE::CommonLibSSE
 		spdlog::spdlog
-		quickjs::quickjs
 )
 
 target_link_options(${PROJECT_NAME}

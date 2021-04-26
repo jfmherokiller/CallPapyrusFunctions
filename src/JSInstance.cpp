@@ -1,10 +1,7 @@
 #include "TypeHandling.hpp"
-#include "quickjspp.hpp"
 
 #include <any>
 #include <map>
-qjs::Runtime* myJSInstance::runtime = new qjs::Runtime();
-qjs::Context* myJSInstance::mycontext = new qjs::Context(*runtime);
 
 RE::TESForm* StringToForm(const std::string& formHex)
 {
@@ -33,48 +30,12 @@ std::vector<std::string> Splitter(const std::string& basetext, const char delim)
 }
 myJSInstance::myJSInstance()
 {
-	ReinsertOSAndStd();
-}
-
-void myJSInstance::RemakeRuntime()
-{
-	delete runtime;
-	delete mycontext;
-	runtime = new qjs::Runtime();
-	mycontext = new qjs::Context(*runtime);
-	ReinsertOSAndStd();
-}
-
-void myJSInstance::ReinsertOSAndStd()
-{
-	auto myctx = mycontext->ctx;
-	qjs::Utility::AddAllBaseParts(myctx);
-	mycontext->eval(exposeOSAndStd.c_str(), "<input>", JS_EVAL_TYPE_MODULE);
-	CustomModules();
 }
 
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
 {
-	a_registry->RegisterFunction("EvalateJsExpression", "MyPluginScript", EvalateJsExpression);
 	a_registry->RegisterFunction("CallGlobalFunction", "MyPluginScript", CallGlobalFunction);
 	return true;
-}
-
-void myJSInstance::EvalateJsExpression(RE::StaticFunctionTag*, RE::BSFixedString expression)
-{
-	try {
-		auto returnedValue = mycontext->eval(expression.c_str(), "<cmdline>", JS_EVAL_TYPE_MODULE);
-		auto mstr = static_cast<std::string>(returnedValue);
-		if (mstr != "undefined") {
-			PrintStringToConsoleFile(mstr.c_str());
-		}
-	} catch (qjs::exception) {
-		auto exc = mycontext->getException();
-		PrintStringToConsoleFile(static_cast<std::string>(exc).data());
-		if (static_cast<bool>(exc["stack"])) {
-			PrintStringToConsoleFile(static_cast<std::string>(exc["stack"]).data());
-		}
-	}
 }
 
 RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
@@ -520,12 +481,4 @@ void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedS
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
-}
-
-void myJSInstance::CustomModules()
-{
-	auto& custMod = mycontext->addModule("testmod");
-	//custMod.function<&myJSInstance::TestFunct>("testme");
-	custMod.function<&PrintStringToConsoleFile2>("printme");
-	mycontext->eval("import * as testmod from 'testmod'; globalThis.testmod = testmod; globalThis.printme = testmod.printme;", "<import>", JS_EVAL_TYPE_MODULE);
 }

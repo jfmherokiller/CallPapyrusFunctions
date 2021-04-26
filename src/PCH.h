@@ -2,9 +2,6 @@
 
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
-#include "quickjs.h"
-#include "quickjs-libc.h"
-#include "storage/quickjs-storage.h"
 #include "PluginsFuncts.h"
 #include <spdlog/sinks/basic_file_sink.h>
 
