@@ -2,6 +2,7 @@
 extern void PrintStringToConsoleFile(const char* Part);
 extern void PrintStringToConsoleFileFree(char* Part);
 extern void PrintStringToConsoleFile2(const std::string& str);
+extern std::vector<std::string> Splitter(const std::string& basetext, char delim);
 class myJSInstance
 {
 private:
