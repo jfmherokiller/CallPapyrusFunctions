@@ -488,7 +488,6 @@ RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::Object
 void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-	auto ObjectMap = impvm->objectTypeMap;
 	std::string classfunctStr = classfunct.c_str();
 	std::string arglistStr = arglist.c_str();
 	// Remove all double-quote characters
@@ -504,7 +503,24 @@ void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedStr
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
+void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+{
+	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+	std::string classfunctStr = classfunct.c_str();
+	std::string arglistStr = arglist.c_str();
+	// Remove all double-quote characters
+	classfunctStr.erase(remove(classfunctStr.begin(), classfunctStr.end(), '\"'), classfunctStr.end());
+	arglistStr.erase(remove(arglistStr.begin(), arglistStr.end(), '\"'), arglistStr.end());
 
+	std::vector<std::string> classfunctSplitParts = Splitter(classfunctStr, '.');
+	std::vector<std::string> functionArgs = Splitter(arglistStr, ',');
+	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
+	if (globalFunct == nullptr)
+		return;
+	const auto functargs = ConvertArgs(globalFunct, functionArgs);
+	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
+	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
+}
 
 void myJSInstance::CustomModules()
 {
