@@ -71,6 +71,18 @@ std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::Obj
 	}
 	return ParamData;
 }
+std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct)
+{
+	auto innerFunct = globalFunct->func;
+	std::vector<RE::BSScript::TypeInfo> ParamData;
+	for (std::uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
+		RE::BSFixedString paramName;
+		RE::BSScript::TypeInfo paramType;
+		innerFunct->GetParam(paramIndex, paramName, paramType);
+		ParamData.push_back(paramType);
+	}
+	return ParamData;
+}
 bool StringToBool(std::string s, bool throw_on_error = true)
 {
 	auto result = false;  // failure to assert is false
@@ -415,7 +427,39 @@ bool myJSInstance::HandleThreeValues(std::vector<std::string> args, std::vector<
 	}
 	return false;
 }
-
+RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct, std::vector<std::string> args)
+{
+	auto argvals = GetFunctArgs(globalFunct);
+	RE::BSScript::TypeInfo typeValOne;
+	RE::BSScript::TypeInfo typeValtwo;
+	RE::BSScript::TypeInfo typeValthree;
+	std::string valStringOne;
+	std::string valStringTwo;
+	std::string valStringThree;
+	RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
+	if (!argvals.empty()) {
+		typeValOne = argvals.at(0);
+		valStringOne = args.at(0);
+	}
+	if (argvals.size() >= 2) {
+		typeValtwo = argvals.at(1);
+		valStringTwo = args.at(1);
+	}
+	if (argvals.size() == 3) {
+		typeValthree = argvals.at(2);
+		valStringThree = args.at(2);
+	}
+	if (argvals.size() == 1) {
+		HandleSingleValue(argvals, typeValOne, valStringOne, value1);
+	}
+	if (argvals.size() == 2) {
+		HandleTwoValues(args, argvals, typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
+	}
+	if (argvals.size() == 3) {
+		HandleThreeValues(args, argvals, typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
+	}
+	return value1;
+}
 RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct, std::vector<std::string> args)
 {
 	auto argvals = GetFunctArgs(globalFunct);
@@ -481,7 +525,7 @@ void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedS
 	//const auto InstanceForm = StringToForm(functionArgs.front());
 	functionArgs.erase(functionArgs.begin());
 
-	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
+	const auto globalFunct = GetMemberFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
