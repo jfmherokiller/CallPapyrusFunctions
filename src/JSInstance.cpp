@@ -42,7 +42,23 @@ RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE
 	}
 	return nullptr;
 }
-
+RE::BSScript::ObjectTypeInfo::MemberFuncInfo* myJSInstance::GetMemberFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
+{
+	for (const auto& object_type : impvm->objectTypeMap) {
+		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
+			auto objectInfo = object_type.second;
+			for (std::uint32_t index = 0; index < objectInfo->GetNumMemberFuncs(); ++index) {
+				const auto globalFunct = objectInfo->GetMemberFuncIter() + index;
+				if (strcmp(globalFunct->func->GetName().c_str(), classfunctSplitParts.at(1).c_str()) == 0) {
+					if (globalFunct->func->GetParamCount() == numArgs) {
+						return globalFunct;
+					}
+				}
+			}
+		}
+	}
+	return nullptr;
+}
 std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct)
 {
 	auto innerFunct = globalFunct->func;
@@ -459,13 +475,20 @@ void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedS
 	// Remove all double-quote characters
 	classfunctStr.erase(remove(classfunctStr.begin(), classfunctStr.end(), '\"'), classfunctStr.end());
 	arglistStr.erase(remove(arglistStr.begin(), arglistStr.end(), '\"'), arglistStr.end());
-
 	std::vector<std::string> classfunctSplitParts = Splitter(classfunctStr, '.');
 	std::vector<std::string> functionArgs = Splitter(arglistStr, ',');
+	//grab form from vector
+	//const auto InstanceForm = StringToForm(functionArgs.front());
+	functionArgs.erase(functionArgs.begin());
+
 	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
-	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
+	//const auto MyInstance = InstanceForm->AsReference()->CreateRefHandle();
+	RE::BSTSmartPointer<RE::BSScript::Object> ObjectPart;
+	impvm->CreateObject(classfunctSplitParts.at(0),ObjectPart);
+	impvm->DispatchMethodCall(ObjectPart,classfunctSplitParts.at(1),functargs,aaaclass);
+	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
