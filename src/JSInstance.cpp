@@ -28,13 +28,11 @@ std::vector<std::string> Splitter(const std::string& basetext, const char delim)
 		tokens.push_back(buf);
 	return tokens;
 }
-myJSInstance::myJSInstance()
-{
-}
+myJSInstance::myJSInstance()= default;
 
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
 {
-	a_registry->RegisterFunction("CallGlobalFunction", "MyPluginScript", CallGlobalFunction);
+	a_registry->RegisterFunction("CallGlobalFunction", "CallGlobalFuncts", CallGlobalFunction);
 	return true;
 }
 

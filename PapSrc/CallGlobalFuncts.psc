@@ -1,0 +1,3 @@
+scriptName CallGlobalFuncts Hidden
+
+Function CallGlobalFunction(string ClassFunctName,string ArgListString) global native

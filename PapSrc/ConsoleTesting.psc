@@ -34,10 +34,6 @@ Bool Function ChoseCommandTable(string[] cmd)
 	if cmd[0]=="version"
 		Debug.Notification("This is version 1.0!")
 		bSuccess=true
-	ElseIf(cmd[0] == "jseval")
-		MyPluginScript.EvalateJsExpression(cmd[1])
-	ElseIf(cmd[0] == "jseval2")
-		MyPluginScript.EvalateJsExpression("std.evalScript("+cmd[1]+")")
 	ElseIf(cmd[0] == "cgfm")
 		MyPluginScript.CallGlobalFunction(cmd[1],cmd[2])
 	endif

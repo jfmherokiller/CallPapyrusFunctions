@@ -7,7 +7,7 @@ set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 # ---- Project ----
 
 project(
-	ExampleProject
+	CallPaparusFunctions
 	VERSION 1.0.0
 	LANGUAGES CXX
 )
