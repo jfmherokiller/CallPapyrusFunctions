@@ -17,7 +17,7 @@ T* StringToForm(const std::string& formHex)
 	return RefTesting2;
 }
 
-myJSInstance::myJSInstance()= default;
+myJSInstance::myJSInstance() = default;
 
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
 {
@@ -62,20 +62,17 @@ RE::BSScript::ObjectTypeInfo::MemberFuncInfo* myJSInstance::GetMemberFunction(RE
 std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct)
 {
 	auto innerFunct = globalFunct->func;
-	std::vector<RE::BSScript::TypeInfo> ParamData;
-	for (std::uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
-		RE::BSFixedString paramName;
-		RE::BSScript::TypeInfo paramType;
-		innerFunct->GetParam(paramIndex, paramName, paramType);
-		ParamData.push_back(paramType);
-	}
-	return ParamData;
+	return getFunctArgsBody(innerFunct);
 }
 std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct)
 {
 	auto innerFunct = globalFunct->func;
+	return getFunctArgsBody(innerFunct);
+}
+std::vector<RE::BSScript::TypeInfo> myJSInstance::getFunctArgsBody(const RE::BSTSmartPointer<RE::BSScript::IFunction>& innerFunct)
+{
 	std::vector<RE::BSScript::TypeInfo> ParamData;
-	for (std::uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
+	for (uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
 		RE::BSFixedString paramName;
 		RE::BSScript::TypeInfo paramType;
 		innerFunct->GetParam(paramIndex, paramName, paramType);
@@ -118,7 +115,7 @@ bool myJSInstance::HandleSingleValue(std::vector<RE::BSScript::TypeInfo> argvals
 	} else if (typeValOne.IsInt()) {
 		value1 = RE::MakeFunctionArguments<int>(StringToInt(valStringOne));
 		return true;
-	} else if(typeValOne.IsObject()) {
+	} else if (typeValOne.IsObject()) {
 		if (strcmp(typeValOne.GetTypeInfo()->GetName(), "Actor") == 0) {
 			auto pActorBase = StringToForm<RE::TESActorBase>(valStringOne);
 			value1 = RE::MakeFunctionArguments(pActorBase->AsReference()->GetTemplateActorBase());
@@ -430,39 +427,15 @@ bool myJSInstance::HandleThreeValues(std::vector<std::string> args, std::vector<
 RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct, std::vector<std::string> args)
 {
 	auto argvals = GetFunctArgs(globalFunct);
-	RE::BSScript::TypeInfo typeValOne;
-	RE::BSScript::TypeInfo typeValtwo;
-	RE::BSScript::TypeInfo typeValthree;
-	std::string valStringOne;
-	std::string valStringTwo;
-	std::string valStringThree;
-	RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
-	if (!argvals.empty()) {
-		typeValOne = argvals.at(0);
-		valStringOne = args.at(0);
-	}
-	if (argvals.size() >= 2) {
-		typeValtwo = argvals.at(1);
-		valStringTwo = args.at(1);
-	}
-	if (argvals.size() == 3) {
-		typeValthree = argvals.at(2);
-		valStringThree = args.at(2);
-	}
-	if (argvals.size() == 1) {
-		HandleSingleValue(argvals, typeValOne, valStringOne, value1);
-	}
-	if (argvals.size() == 2) {
-		HandleTwoValues(args, argvals, typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
-	}
-	if (argvals.size() == 3) {
-		HandleThreeValues(args, argvals, typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
-	}
-	return value1;
+	return getArgumentsBody(args, argvals);
 }
 RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct, std::vector<std::string> args)
 {
 	auto argvals = GetFunctArgs(globalFunct);
+	return getArgumentsBody(args, argvals);
+}
+RE::BSScript::IFunctionArguments* myJSInstance::getArgumentsBody(std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo>& argvals)
+{
 	RE::BSScript::TypeInfo typeValOne;
 	RE::BSScript::TypeInfo typeValtwo;
 	RE::BSScript::TypeInfo typeValthree;
@@ -532,7 +505,7 @@ void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedS
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	//const auto MyInstance = InstanceForm->AsReference()->CreateRefHandle();
 	RE::BSTSmartPointer<RE::BSScript::Object> ObjectPart;
-	impvm->CreateObject(classfunctSplitParts.at(0),ObjectPart);
-	impvm->DispatchMethodCall(ObjectPart,classfunctSplitParts.at(1),functargs,aaaclass);
+	impvm->CreateObject(classfunctSplitParts.at(0), ObjectPart);
+	impvm->DispatchMethodCall(ObjectPart, classfunctSplitParts.at(1), functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
