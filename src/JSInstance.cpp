@@ -2,20 +2,8 @@
 
 #include <any>
 #include <map>
+#include <utility>
 
-RE::TESForm* StringToForm(const std::string& formHex)
-{
-	const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
-	const auto RefTesting2 = RE::TESForm::LookupByID(Playerform);
-	return RefTesting2;
-}
-template <typename T>
-T* StringToForm(const std::string& formHex)
-{
-	const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
-	const auto RefTesting2 = RE::TESForm::LookupByID<T>(Playerform);
-	return RefTesting2;
-}
 
 myJSInstance::myJSInstance() = default;
 
@@ -466,17 +454,13 @@ RE::BSScript::IFunctionArguments* myJSInstance::getArgumentsBody(std::vector<std
 	}
 	return value1;
 }
+
+
 void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
+	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(std::move(classfunct), '.');
+	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(std::move(arglist), ',');
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-	std::string classfunctStr = classfunct.c_str();
-	std::string arglistStr = arglist.c_str();
-	// Remove all double-quote characters
-	classfunctStr.erase(remove(classfunctStr.begin(), classfunctStr.end(), '\"'), classfunctStr.end());
-	arglistStr.erase(remove(arglistStr.begin(), arglistStr.end(), '\"'), arglistStr.end());
-
-	std::vector<std::string> classfunctSplitParts = Splitter(classfunctStr, '.');
-	std::vector<std::string> functionArgs = Splitter(arglistStr, ',');
 	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
@@ -486,26 +470,18 @@ void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedStr
 }
 void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
-	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-	std::string classfunctStr = classfunct.c_str();
-	std::string arglistStr = arglist.c_str();
-	// Remove all double-quote characters
-	classfunctStr.erase(remove(classfunctStr.begin(), classfunctStr.end(), '\"'), classfunctStr.end());
-	arglistStr.erase(remove(arglistStr.begin(), arglistStr.end(), '\"'), arglistStr.end());
-	std::vector<std::string> classfunctSplitParts = Splitter(classfunctStr, '.');
-	std::vector<std::string> functionArgs = Splitter(arglistStr, ',');
-	//grab form from vector
-	//const auto InstanceForm = StringToForm(functionArgs.front());
-	functionArgs.erase(functionArgs.begin());
+	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(std::move(classfunct), '.');
+	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(std::move(arglist), ',');
 
+	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+	//grab form from vector
+	const auto ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, functionArgs.front());
+	functionArgs.erase(functionArgs.begin());
 	const auto globalFunct = GetMemberFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
-	//const auto MyInstance = InstanceForm->AsReference()->CreateRefHandle();
-	RE::BSTSmartPointer<RE::BSScript::Object> ObjectPart;
-	impvm->CreateObject(classfunctSplitParts.at(0), ObjectPart);
-	impvm->DispatchMethodCall(ObjectPart, classfunctSplitParts.at(1), functargs, aaaclass);
+	impvm->DispatchMethodCall(ObjectVmHandle, globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }

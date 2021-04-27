@@ -1,5 +1,4 @@
 
-extern std::vector<std::string> Splitter(const std::string& basetext, char delim);
 class myJSInstance
 {
 private:

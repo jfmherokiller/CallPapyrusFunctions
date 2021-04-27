@@ -3,6 +3,7 @@
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 #include "PluginsFuncts.h"
+#include "UtilFunctions.h"
 #include <spdlog/sinks/basic_file_sink.h>
 
 #ifndef NDEBUG

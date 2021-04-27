@@ -127,7 +127,7 @@ set(headers
 	src/PCH.h
 	src/PluginsFuncts.h
 	src/TypeHandling.hpp
-)
+        src/UtilFunctions.h)
 
 set(sources
 	src/main.cpp
