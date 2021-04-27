@@ -12,7 +12,7 @@
 		return false;
 	}
 
-	*path /= "MyFirstPlugin.log"sv;
+	*path /= "CallPaparusFunctions.log"sv;
 	sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 	auto log = std::make_shared<spdlog::logger>("global log"s, begin(sinks), end(sinks));
 
@@ -26,10 +26,10 @@
 	spdlog::set_default_logger(std::move(log));
 	spdlog::set_pattern("%g(%#): [%^%l%$] %v"s);
 
-	logger::info("MyFirstPlugin v1.0.0");
+	logger::info("CallPaparusFunctions v1.0.0");
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "MyFirstPlugin";
+	a_info->name = "CallPaparusFunctions";
 	a_info->version = 1;
 
 	if (a_skse->IsEditor())
@@ -53,7 +53,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	myJSInstance JsSetup;
 	spdlog::flush_every(std::chrono::seconds(5));
 
-	logger::info("MyFirstPlugin loaded");
+	logger::info("CallPaparusFunctions loaded");
 
 	SKSE::Init(a_skse);
 	auto papyrus = SKSE::GetPapyrusInterface();

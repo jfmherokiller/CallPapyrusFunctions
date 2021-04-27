@@ -10,6 +10,7 @@ myJSInstance::myJSInstance() = default;
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
 {
 	a_registry->RegisterFunction("CallGlobalFunction", "CallGlobalFuncts", CallGlobalFunction);
+	a_registry->RegisterFunction("CallInstanceFunction", "CallGlobalFuncts", CallInstanceFunction);
 	return true;
 }
 
