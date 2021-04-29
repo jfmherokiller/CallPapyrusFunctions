@@ -1,4 +1,6 @@
-﻿std::vector<std::string> Splitter(const std::string& basetext, const char delim)
+﻿#include <utility>
+
+std::vector<std::string> Splitter(const std::string& basetext, const char delim)
 {
 	std::string buf;				 // Have a buffer string
 	std::stringstream ss(basetext);	 // Insert the string into a stream
@@ -9,12 +11,12 @@
 		tokens.push_back(buf);
 	return tokens;
 }
-std::string RemoveDoubleQuoteChars(RE::BSFixedString input) {
+std::string RemoveDoubleQuoteChars(const RE::BSFixedString& input) {
 	std::string innerstring = input.c_str();
 	innerstring.erase(remove(innerstring.begin(), innerstring.end(), '\"'), innerstring.end());
 	return innerstring;
 }
-std::vector<std::string> RemoveQuotesAndSplit(RE::BSFixedString input,char splitterchar) {
+std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,char splitterchar) {
 	auto input2 = RemoveDoubleQuoteChars(input);
 	auto splittedString = Splitter(input2,splitterchar);
 	return splittedString;

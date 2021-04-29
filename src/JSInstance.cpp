@@ -105,9 +105,9 @@ bool myJSInstance::HandleSingleValue(std::vector<RE::BSScript::TypeInfo> argvals
 		value1 = RE::MakeFunctionArguments<int>(StringToInt(valStringOne));
 		return true;
 	} else if (typeValOne.IsObject()) {
-		if (strcmp(typeValOne.GetTypeInfo()->GetName(), "Actor") == 0) {
-			auto pActorBase = StringToForm<RE::TESActorBase>(valStringOne);
-			value1 = RE::MakeFunctionArguments(pActorBase->AsReference()->GetTemplateActorBase());
+		auto TheTESForm = StringToForm<RE::TESForm>(valStringOne);
+		if(TheTESForm->GetFormType() == RE::FormType::ActorCharacter) {
+			value1 = RE::MakeFunctionArguments(TheTESForm->As<RE::TESActorBase>()->AsReference()->GetTemplateActorBase());
 			return true;
 		}
 	}
@@ -176,7 +176,7 @@ bool myJSInstance::HandleTwoValues(std::vector<std::string> args, std::vector<RE
 	return false;
 }
 
-bool myJSInstance::HandleThreeValues(std::vector<std::string> args, std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, RE::BSScript::TypeInfo typeValthree, std::string valStringOne, std::string valStringTwo, std::string valStringThree, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleThreeValues(const std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, RE::BSScript::TypeInfo typeValthree, std::string valStringOne, std::string valStringTwo, std::string valStringThree, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		if (typeValtwo.IsString()) {
@@ -459,8 +459,8 @@ RE::BSScript::IFunctionArguments* myJSInstance::getArgumentsBody(std::vector<std
 
 void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
-	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(std::move(classfunct), '.');
-	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(std::move(arglist), ',');
+	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
+	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
@@ -471,8 +471,8 @@ void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedStr
 }
 void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
-	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(std::move(classfunct), '.');
-	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(std::move(arglist), ',');
+	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
+	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
 
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	//grab form from vector

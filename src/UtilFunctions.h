@@ -4,7 +4,7 @@
 
 #ifndef CALLPAPARUSFUNCTIONS_UTILFUNCTIONS_H
 #define CALLPAPARUSFUNCTIONS_UTILFUNCTIONS_H
-extern std::vector<std::string> RemoveQuotesAndSplit(RE::BSFixedString input,char splitterchar);
+extern std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,char splitterchar);
 template <typename T>
 T* StringToForm(const std::string& formHex)
 {

@@ -1,4 +1,4 @@
-﻿extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+﻿extern "C" [[maybe_unused]] DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	std::vector<spdlog::sink_ptr> sinks;
 #ifndef NDEBUG
@@ -48,16 +48,16 @@
 	return true;
 }
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+extern "C" [[maybe_unused]] DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	myJSInstance JsSetup;
+	myJSInstance();
 	spdlog::flush_every(std::chrono::seconds(5));
 
 	logger::info("CallPaparusFunctions loaded");
 
 	SKSE::Init(a_skse);
 	auto papyrus = SKSE::GetPapyrusInterface();
-	if (!papyrus->Register(JsSetup.RegisterFuncts))
+	if (!papyrus->Register(myJSInstance::RegisterFuncts))
 	{
 		return false;
 	}
