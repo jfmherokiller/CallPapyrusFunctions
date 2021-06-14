@@ -90,7 +90,7 @@ bool StringToBool(std::string s, bool throw_on_error = true)
 	return result;
 }
 
-bool myJSInstance::HandleSingleValue(std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, std::string valStringOne, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleSingleValue(RE::BSScript::TypeInfo typeValOne, std::string valStringOne, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		value1 = RE::MakeFunctionArguments<RE::BSFixedString>(BsString(valStringOne));
@@ -114,7 +114,7 @@ bool myJSInstance::HandleSingleValue(std::vector<RE::BSScript::TypeInfo> argvals
 	return false;
 }
 
-bool myJSInstance::HandleTwoValues(std::vector<std::string> args, std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, std::string valStringOne, std::string valStringTwo, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleTwoValues( RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, std::string valStringOne, std::string valStringTwo, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		if (typeValtwo.IsString()) {
@@ -176,7 +176,7 @@ bool myJSInstance::HandleTwoValues(std::vector<std::string> args, std::vector<RE
 	return false;
 }
 
-bool myJSInstance::HandleThreeValues(const std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo> argvals, RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, RE::BSScript::TypeInfo typeValthree, std::string valStringOne, std::string valStringTwo, std::string valStringThree, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleThreeValues(RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, RE::BSScript::TypeInfo typeValthree, std::string valStringOne, std::string valStringTwo, std::string valStringThree, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		if (typeValtwo.IsString()) {
@@ -445,19 +445,19 @@ RE::BSScript::IFunctionArguments* myJSInstance::getArgumentsBody(std::vector<std
 		valStringThree = args.at(2);
 	}
 	if (argvals.size() == 1) {
-		HandleSingleValue(argvals, typeValOne, valStringOne, value1);
+		HandleSingleValue(typeValOne, valStringOne, value1);
 	}
 	if (argvals.size() == 2) {
-		HandleTwoValues(args, argvals, typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
+		HandleTwoValues(typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
 	}
 	if (argvals.size() == 3) {
-		HandleThreeValues(args, argvals, typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
+		HandleThreeValues(typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
 	}
 	return value1;
 }
 
 
-void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
@@ -469,7 +469,7 @@ void myJSInstance::CallGlobalFunction(RE::StaticFunctionTag* aaa, RE::BSFixedStr
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
-void myJSInstance::CallInstanceFunction(RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
