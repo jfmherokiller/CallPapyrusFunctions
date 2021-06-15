@@ -95,6 +95,7 @@ set(SOURCES
 	src/PCH.h
 	src/UtilityFunctions.cpp
 	src/JSInstance.cpp
+	src/TypeHandling.cpp
 )
 
 source_group(
