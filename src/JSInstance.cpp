@@ -90,7 +90,7 @@ bool StringToBool(std::string s, bool throw_on_error = true)
 	return result;
 }
 
-bool myJSInstance::HandleSingleValue(RE::BSScript::TypeInfo typeValOne, std::string valStringOne, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleSingleValue(const RE::BSScript::TypeInfo& typeValOne, const std::string& valStringOne, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		value1 = RE::MakeFunctionArguments<RE::BSFixedString>(BsString(valStringOne));
@@ -114,7 +114,7 @@ bool myJSInstance::HandleSingleValue(RE::BSScript::TypeInfo typeValOne, std::str
 	return false;
 }
 
-bool myJSInstance::HandleTwoValues( RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, std::string valStringOne, std::string valStringTwo, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleTwoValues( const RE::BSScript::TypeInfo& typeValOne, const RE::BSScript::TypeInfo& typeValtwo, const std::string& valStringOne, const std::string& valStringTwo, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		if (typeValtwo.IsString()) {
@@ -176,7 +176,7 @@ bool myJSInstance::HandleTwoValues( RE::BSScript::TypeInfo typeValOne, RE::BSScr
 	return false;
 }
 
-bool myJSInstance::HandleThreeValues(RE::BSScript::TypeInfo typeValOne, RE::BSScript::TypeInfo typeValtwo, RE::BSScript::TypeInfo typeValthree, std::string valStringOne, std::string valStringTwo, std::string valStringThree, RE::BSScript::IFunctionArguments*& value1)
+bool myJSInstance::HandleThreeValues(const RE::BSScript::TypeInfo& typeValOne, const RE::BSScript::TypeInfo& typeValtwo, const RE::BSScript::TypeInfo& typeValthree, const std::string& valStringOne, const std::string& valStringTwo, const std::string& valStringThree, RE::BSScript::IFunctionArguments*& value1)
 {
 	if (typeValOne.IsString()) {
 		if (typeValtwo.IsString()) {
