@@ -2,8 +2,7 @@
 // Created by peter on 4/27/21.
 //
 
-#ifndef CALLPAPARUSFUNCTIONS_UTILFUNCTIONS_H
-#define CALLPAPARUSFUNCTIONS_UTILFUNCTIONS_H
+#pragma once
 extern std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,char splitterchar);
 template <typename T>
 T* StringToForm(const std::string& formHex)
@@ -21,4 +20,4 @@ RE::VMHandle StringToVmHandle(RE::BSScript::Internal::VirtualMachine* impvm,cons
 	const auto ObjectVmHandle = policy->GetHandleForObject(RefTesting2->GetFormType(), RefTesting2);
 	return ObjectVmHandle;
 }
-#endif	//CALLPAPARUSFUNCTIONS_UTILFUNCTIONS_H
+
