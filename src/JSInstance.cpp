@@ -1,13 +1,13 @@
 myJSInstance::myJSInstance() = default;
 
-bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
+bool myJSInstance::RegisterFuncts(BSScriptVmPtr a_registry)
 {
 	a_registry->RegisterFunction("CallGlobalFunction", "CallGlobalFuncts", CallGlobalFunction);
 	a_registry->RegisterFunction("CallInstanceFunction", "CallGlobalFuncts", CallInstanceFunction);
 	return true;
 }
 
-RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
+globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
 {
 	for (const auto& object_type : impvm->objectTypeMap) {
 		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
@@ -24,7 +24,7 @@ RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* myJSInstance::GetGlobalFunction(RE
 	}
 	return nullptr;
 }
-RE::BSScript::ObjectTypeInfo::MemberFuncInfo* myJSInstance::GetMemberFunction(RE::BSScript::Internal::VirtualMachine* impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
+MemberFunctInfoPtr myJSInstance::GetMemberFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
 {
 	for (const auto& object_type : impvm->objectTypeMap) {
 		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
