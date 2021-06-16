@@ -41,70 +41,62 @@ RE::BSScript::ObjectTypeInfo::MemberFuncInfo* myJSInstance::GetMemberFunction(RE
 	}
 	return nullptr;
 }
-std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct)
+std::vector<RE::BSScript::TypeInfo> getFunctArgsBody(const RE::BSTSmartPointer<RE::BSScript::IFunction>& innerFunct)
 {
-	auto innerFunct = globalFunct->func;
-	return getFunctArgsBody(innerFunct);
+    std::vector<RE::BSScript::TypeInfo> ParamData;
+    for (uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
+        RE::BSFixedString paramName;
+        RE::BSScript::TypeInfo paramType;
+        innerFunct->GetParam(paramIndex, paramName, paramType);
+        ParamData.push_back(paramType);
+    }
+    return ParamData;
 }
-std::vector<RE::BSScript::TypeInfo> myJSInstance::GetFunctArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct)
+RE::BSScript::IFunctionArguments* getArgumentsBody(std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo>& argvals)
 {
-	auto innerFunct = globalFunct->func;
-	return getFunctArgsBody(innerFunct);
-}
-std::vector<RE::BSScript::TypeInfo> myJSInstance::getFunctArgsBody(const RE::BSTSmartPointer<RE::BSScript::IFunction>& innerFunct)
-{
-	std::vector<RE::BSScript::TypeInfo> ParamData;
-	for (uint32_t paramIndex = 0; paramIndex < innerFunct->GetParamCount(); ++paramIndex) {
-		RE::BSFixedString paramName;
-		RE::BSScript::TypeInfo paramType;
-		innerFunct->GetParam(paramIndex, paramName, paramType);
-		ParamData.push_back(paramType);
-	}
-	return ParamData;
-}
-RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::MemberFuncInfo* globalFunct, std::vector<std::string> args)
-{
-	auto argvals = GetFunctArgs(globalFunct);
-	return getArgumentsBody(args, argvals);
-}
-RE::BSScript::IFunctionArguments* myJSInstance::ConvertArgs(RE::BSScript::ObjectTypeInfo::GlobalFuncInfo* globalFunct, std::vector<std::string> args)
-{
-	auto argvals = GetFunctArgs(globalFunct);
-	return getArgumentsBody(args, argvals);
-}
-RE::BSScript::IFunctionArguments* myJSInstance::getArgumentsBody(std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo>& argvals)
-{
-	RE::BSScript::TypeInfo typeValOne;
-	RE::BSScript::TypeInfo typeValtwo;
-	RE::BSScript::TypeInfo typeValthree;
-	std::string valStringOne;
-	std::string valStringTwo;
-	std::string valStringThree;
-	RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
-	if (!argvals.empty()) {
-		typeValOne = argvals.at(0);
-		valStringOne = args.at(0);
-	}
-	if (argvals.size() >= 2) {
-		typeValtwo = argvals.at(1);
-		valStringTwo = args.at(1);
-	}
-	if (argvals.size() == 3) {
-		typeValthree = argvals.at(2);
-		valStringThree = args.at(2);
-	}
-	if (argvals.size() == 1) {
+    RE::BSScript::TypeInfo typeValOne;
+    RE::BSScript::TypeInfo typeValtwo;
+    RE::BSScript::TypeInfo typeValthree;
+    std::string valStringOne;
+    std::string valStringTwo;
+    std::string valStringThree;
+    RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
+    if (!argvals.empty()) {
+        typeValOne = argvals.at(0);
+        valStringOne = args.at(0);
+    }
+    if (argvals.size() >= 2) {
+        typeValtwo = argvals.at(1);
+        valStringTwo = args.at(1);
+    }
+    if (argvals.size() == 3) {
+        typeValthree = argvals.at(2);
+        valStringThree = args.at(2);
+    }
+    if (argvals.size() == 1) {
         TypeHandling::HandleSingleValue(typeValOne, valStringOne, value1);
-	}
-	if (argvals.size() == 2) {
+    }
+    if (argvals.size() == 2) {
         TypeHandling::HandleTwoValues(typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
-	}
-	if (argvals.size() == 3) {
+    }
+    if (argvals.size() == 3) {
         TypeHandling::HandleThreeValues(typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
-	}
-	return value1;
+    }
+    return value1;
+}
+template <class T>
+std::vector<RE::BSScript::TypeInfo> GetFunctArgs(T* globalFunct)
+{
+    auto innerFunct = globalFunct->func;
+    return getFunctArgsBody(innerFunct);
 }
 
+template<class T>
+RE::BSScript::IFunctionArguments* ConvertArgs(T* globalFunct, std::vector<std::string> args)
+{
+	auto argvals = GetFunctArgs(globalFunct);
+	return getArgumentsBody(args, argvals);
+}
 
 void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
