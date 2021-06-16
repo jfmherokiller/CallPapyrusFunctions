@@ -1,7 +1,3 @@
-#include "TypeHandling.hpp"
-
-
-
 myJSInstance::myJSInstance() = default;
 
 bool myJSInstance::RegisterFuncts(RE::BSScript::Internal::VirtualMachine* a_registry)
