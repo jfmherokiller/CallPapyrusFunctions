@@ -1,7 +1,6 @@
 //
 // Created by peter on 6/15/21.
 //
-#include "TypeHandling.hpp"
 bool StringToBool(std::string s, bool throw_on_error = true)
 {
     auto result = false;  // failure to assert is false
