@@ -1,8 +1,5 @@
 #include "TypeHandling.hpp"
 
-#include <any>
-#include <map>
-#include <utility>
 
 
 myJSInstance::myJSInstance() = default;
