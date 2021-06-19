@@ -1,3 +1,5 @@
 [submodule "extern/CommonLibSSE"]
 	path = extern/CommonLibSSE
-	url = https://github.com/Ryan-rsm-McKenzie/CommonLibSSE
+	url = https://github.com/jfmherokiller/CommonLibSSE.git
+	update = rebase
+	branch = master
