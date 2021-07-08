@@ -56,47 +56,6 @@ std::vector<RE::BSScript::TypeInfo> getFunctArgsBody(const RE::BSTSmartPointer<R
     }
     return ParamData;
 }
-RE::BSScript::IFunctionArguments* getArgumentsBody(std::vector<std::string>& args, std::vector<RE::BSScript::TypeInfo>& argvals)
-{
-    RE::BSScript::TypeInfo typeValOne;
-    RE::BSScript::TypeInfo typeValtwo;
-    RE::BSScript::TypeInfo typeValthree;
-    std::string valStringOne;
-    std::string valStringTwo;
-    std::string valStringThree;
-    RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
-	std::vector<std::tuple<std::string,RE::BSScript::TypeInfo>> TypeSets;
-	std::vector<RE::BSScript::Variable> VariableList;
-	for(auto i=0;i<args.size();i++) {
-		auto MyTuple = std::tuple(args[i],argvals[i]);
-		TypeSets.push_back(MyTuple);
-	}
-	if(VariableList.size() == 1) {
-		value1 = RE::MakeFunctionArguments(VariableList.at(0));
-	}
-    if (!argvals.empty()) {
-        typeValOne = argvals.at(0);
-        valStringOne = args.at(0);
-    }
-    if (argvals.size() >= 2) {
-        typeValtwo = argvals.at(1);
-        valStringTwo = args.at(1);
-    }
-    if (argvals.size() == 3) {
-        typeValthree = argvals.at(2);
-        valStringThree = args.at(2);
-    }
-    if (argvals.size() == 1) {
-        TypeHandling::HandleSingleValue(typeValOne, valStringOne, value1);
-    }
-    if (argvals.size() == 2) {
-        TypeHandling::HandleTwoValues(typeValOne, typeValtwo, valStringOne, valStringTwo, value1);
-    }
-    if (argvals.size() == 3) {
-        TypeHandling::HandleThreeValues(typeValOne, typeValtwo, typeValthree, valStringOne, valStringTwo, valStringThree, value1);
-    }
-    return value1;
-}
 template <class T>
 std::vector<RE::BSScript::TypeInfo> GetFunctArgs(T* globalFunct)
 {
@@ -108,7 +67,7 @@ template<class T>
 RE::BSScript::IFunctionArguments* ConvertArgs(T* globalFunct, std::vector<std::string> args)
 {
 	auto argvals = GetFunctArgs(globalFunct);
-	return getArgumentsBody(args, argvals);
+	return MakeFunctionArgs::getArgumentsBody(args, argvals);
 }
 //these are the functions passed to the papyrus engine
 void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)

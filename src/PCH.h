@@ -5,6 +5,7 @@
 #include "PluginsFuncts.h"
 #include "UtilFunctions.h"
 #include "TypeHandling.hpp"
+#include "NewTypeHandling.hpp"
 #pragma warning(push)
 #ifdef NDEBUG
 #	include <spdlog/sinks/basic_file_sink.h>

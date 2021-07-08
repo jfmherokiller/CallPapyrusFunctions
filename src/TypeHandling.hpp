@@ -10,5 +10,4 @@ public:
     static bool HandleThreeValues(const RE::BSScript::TypeInfo& typeValOne, const RE::BSScript::TypeInfo& typeValtwo, const RE::BSScript::TypeInfo& typeValthree, const std::string& valStringOne, const std::string& valStringTwo, const std::string& valStringThree, RE::BSScript::IFunctionArguments*& value1);
     static bool HandleObjectValue(const std::string& valStringOne, RE::BSScript::IFunctionArguments*& value1);
     static bool HandleObjectValue(const std::string& valStringOne,std::vector<RE::BSScript::Variable>*& VariableList);
-	static bool HandleAllValues(const std::vector<std::tuple<std::string,RE::BSScript::TypeInfo>>& TypeSets,std::vector<RE::BSScript::Variable>*& VariableList);
 };
