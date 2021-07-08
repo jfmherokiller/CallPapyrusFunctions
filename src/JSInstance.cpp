@@ -10,11 +10,13 @@ bool myJSInstance::RegisterFuncts(BSScriptVmPtr a_registry)
 globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
 {
 	for (const auto& object_type : impvm->objectTypeMap) {
-		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
+        auto ClassName = classfunctSplitParts.at(0);
+        auto FunctionName = classfunctSplitParts.at(1);
+		if (strcmp(object_type.first.c_str(),ClassName.c_str()) == 0) {
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index) {
 				const auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
-				if (strcmp(globalFunct->func->GetName().c_str(), classfunctSplitParts.at(1).c_str()) == 0) {
+				if (strcmp(globalFunct->func->GetName().c_str(), FunctionName.c_str()) == 0) {
 					if (globalFunct->func->GetParamCount() == numArgs) {
 						return globalFunct;
 					}
@@ -27,11 +29,13 @@ globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vec
 MemberFunctInfoPtr myJSInstance::GetMemberFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
 {
 	for (const auto& object_type : impvm->objectTypeMap) {
-		if (strcmp(object_type.first.c_str(), classfunctSplitParts.at(0).c_str()) == 0) {
+		auto ClassName = classfunctSplitParts.at(0);
+		auto FunctionName = classfunctSplitParts.at(1);
+		if (strcmp(object_type.first.c_str(), ClassName.c_str()) == 0) {
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumMemberFuncs(); ++index) {
 				const auto globalFunct = objectInfo->GetMemberFuncIter() + index;
-				if (strcmp(globalFunct->func->GetName().c_str(), classfunctSplitParts.at(1).c_str()) == 0) {
+				if (strcmp(globalFunct->func->GetName().c_str(), FunctionName.c_str()) == 0) {
 					if (globalFunct->func->GetParamCount() == numArgs) {
 						return globalFunct;
 					}
