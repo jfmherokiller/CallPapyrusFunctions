@@ -65,6 +65,15 @@ RE::BSScript::IFunctionArguments* getArgumentsBody(std::vector<std::string>& arg
     std::string valStringTwo;
     std::string valStringThree;
     RE::BSScript::IFunctionArguments* value1 = RE::MakeFunctionArguments();
+	std::vector<std::tuple<std::string,RE::BSScript::TypeInfo>> TypeSets;
+	std::vector<RE::BSScript::Variable> VariableList;
+	for(auto i=0;i<args.size();i++) {
+		auto MyTuple = std::tuple(args[i],argvals[i]);
+		TypeSets.push_back(MyTuple);
+	}
+	if(VariableList.size() == 1) {
+		value1 = RE::MakeFunctionArguments(VariableList.at(0));
+	}
     if (!argvals.empty()) {
         typeValOne = argvals.at(0);
         valStringOne = args.at(0);

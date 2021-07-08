@@ -356,3 +356,43 @@ bool TypeHandling::HandleObjectValue(const std::string& valStringOne, RE::BSScri
 	}
 	return false;
 }
+bool TypeHandling::HandleObjectValue(const std::string& valStringOne,std::vector<RE::BSScript::Variable>*& VariableList)
+{
+    auto TheTESForm = StringToForm<RE::TESForm>(valStringOne);
+    auto FormType = TheTESForm->GetFormType();
+    RE::BSScript::Variable adest;
+    if (FormType == RE::FormType::ActorCharacter) {
+        RE::BSScript::PackValue(&adest,TheTESForm->As<RE::TESActorBase>());
+        VariableList->push_back(adest);
+        return true;
+    }
+    if (FormType == RE::FormType::Spell) {
+        RE::BSScript::PackValue(&adest,TheTESForm->As<RE::SpellItem>());
+        VariableList->push_back(adest);
+        return true;
+    }
+    return false;
+}
+bool TypeHandling::HandleAllValues(const std::vector<std::tuple<std::string,RE::BSScript::TypeInfo>>& TypeSets,std::vector<RE::BSScript::Variable>*& VariableList) {
+	for (auto TypeSet : TypeSets) {
+		RE::BSScript::Variable adest;
+		auto typeValOne = std::get<1>(TypeSet);
+		auto valStringOne = std::get<0>(TypeSet);
+        if (typeValOne.IsString()) {
+			RE::BSScript::PackValue(&adest,BsString(valStringOne));
+			VariableList->push_back(adest);
+        } else if (typeValOne.IsBool()) {
+            RE::BSScript::PackValue(&adest,StringToBool(valStringOne));
+            VariableList->push_back(adest);
+        } else if (typeValOne.IsFloat()) {
+            RE::BSScript::PackValue(&adest,StringToFloat(valStringOne));
+            VariableList->push_back(adest);
+        } else if (typeValOne.IsInt()) {
+            RE::BSScript::PackValue(&adest,StringToInt(valStringOne));
+            VariableList->push_back(adest);
+        } else if (typeValOne.IsObject()) {
+            return HandleObjectValue(valStringOne, VariableList);
+        }
+	}
+	return true;
+}
