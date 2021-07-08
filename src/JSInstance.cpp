@@ -97,7 +97,7 @@ RE::BSScript::IFunctionArguments* ConvertArgs(T* globalFunct, std::vector<std::s
 	auto argvals = GetFunctArgs(globalFunct);
 	return getArgumentsBody(args, argvals);
 }
-
+//these are the functions passed to the papyrus engine
 void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
