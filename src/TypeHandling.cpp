@@ -40,7 +40,7 @@ bool TypeHandling::HandleSingleValue(const RE::BSScript::TypeInfo& typeValOne, c
 		value1 = RE::MakeFunctionArguments<int>(StringToInt(valStringOne));
 		return true;
 	} else if (typeValOne.IsObject()) {
-		return HandleObjectValue(typeValOne, valStringOne, value1);
+		return HandleObjectValue(valStringOne, value1);
 	}
 	return false;
 }
@@ -342,7 +342,7 @@ bool TypeHandling::HandleThreeValues(const RE::BSScript::TypeInfo& typeValOne, c
 	}
 	return false;
 }
-bool TypeHandling::HandleObjectValue(const RE::BSScript::TypeInfo& typeValOne, const std::string& valStringOne, RE::BSScript::IFunctionArguments*& value1)
+bool TypeHandling::HandleObjectValue(const std::string& valStringOne, RE::BSScript::IFunctionArguments*& value1)
 {
 	auto TheTESForm = StringToForm<RE::TESForm>(valStringOne);
 	auto FormType = TheTESForm->GetFormType();
@@ -354,4 +354,5 @@ bool TypeHandling::HandleObjectValue(const RE::BSScript::TypeInfo& typeValOne, c
 		value1 = RE::MakeFunctionArguments(TheTESForm->As<RE::SpellItem>());
 		return true;
 	}
+	return false;
 }
