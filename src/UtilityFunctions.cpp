@@ -21,3 +21,14 @@ std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,cha
 	auto splittedString = Splitter(input2,splitterchar);
 	return splittedString;
 }
+RE::BSTSmartPointer<RE::BSScript::Object> StringToObject(RE::BSScript::Internal::VirtualMachine* impvm,const std::string& formHex) {
+    auto policy = impvm->GetObjectHandlePolicy();
+    RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> classPtr;
+    RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
+    const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
+    const auto FormRef = RE::TESForm::LookupByID<RE::TESForm>(Playerform);
+    impvm->GetScriptObjectType1(FormRef->GetName(),classPtr);
+    const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
+    impvm->FindBoundObject(ObjectVmHandle, classPtr->GetName(), objectPtr);
+    return objectPtr;
+}

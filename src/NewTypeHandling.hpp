@@ -36,6 +36,10 @@ namespace MakeFunctionArgs
                 case RawType::kObject:
                 {
                     // TODO
+                    scriptVariable.emplace();
+                    auto vm = Internal::VirtualMachine::GetSingleton();
+					auto myform = StringToObject(vm,arg);
+					scriptVariable->SetObject(myform);
                     break;
                 }
                 case RawType::kString:
