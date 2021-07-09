@@ -96,12 +96,17 @@ set(SOURCES
 	src/UtilityFunctions.cpp
 	src/JSInstance.cpp
 )
-
+set(HEADERS
+ 		src/NewTypeHandling.hpp
+		src/PluginsFuncts.h
+		src/UtilFunctions.h
+)
 source_group(
 	TREE
 		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
 		${SOURCES}
+		${HEADERS}
 )
 
 source_group(
