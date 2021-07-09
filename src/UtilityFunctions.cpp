@@ -21,7 +21,7 @@ std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,cha
 	auto splittedString = Splitter(input2,splitterchar);
 	return splittedString;
 }
-RE::BSTSmartPointer<RE::BSScript::Object> StringToObject(RE::BSScript::Internal::VirtualMachine* impvm,const std::string& formHex) {
+void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm,const std::string& formHex,RE::BSTSmartPointer<RE::BSScript::Object>& myObject) {
     auto policy = impvm->GetObjectHandlePolicy();
     RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> classPtr;
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
@@ -31,5 +31,5 @@ RE::BSTSmartPointer<RE::BSScript::Object> StringToObject(RE::BSScript::Internal:
     impvm->GetScriptObjectType(FormVmType,classPtr);
     const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
     impvm->FindBoundObject(ObjectVmHandle, classPtr->GetName(), objectPtr);
-    return objectPtr;
+	myObject = objectPtr;
 }
