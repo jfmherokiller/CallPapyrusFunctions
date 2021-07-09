@@ -27,7 +27,7 @@ void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::st
     RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> classPtr;
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
     const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
-    const auto FormRef = RE::TESForm::LookupByID<RE::TESForm>(Playerform);
+    const auto FormRef = RE::TESForm::LookupByID(Playerform);
 	const auto FormVmType = static_cast<RE::VMTypeID>(FormRef->GetFormType());
     impvm->GetScriptObjectType(FormVmType,classPtr);
     const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
