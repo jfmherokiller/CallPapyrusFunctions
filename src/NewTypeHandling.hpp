@@ -66,7 +66,16 @@ namespace MakeFunctionArgs
 
                     break;
                 }
-                };
+				case RawType::kNone:
+				case RawType::kNoneArray:
+				case RawType::kObjectArray:
+				case RawType::kStringArray:
+				case RawType::kIntArray:
+				case RawType::kFloatArray:
+				case RawType::kBoolArray:
+				case RawType::kArraysEnd:
+					break;
+				};
 
                 if (scriptVariable)
                 {
