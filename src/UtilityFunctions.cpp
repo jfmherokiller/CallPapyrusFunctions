@@ -24,13 +24,14 @@ std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,cha
 void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& formHex,const RE::BSScript::TypeInfo& TypeArg, RE::BSTSmartPointer<RE::BSScript::Object>& myObject)
 {
     auto policy = impvm->GetObjectHandlePolicy();
-    RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> classPtr;
+    auto classPtr = RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> (TypeArg.GetTypeInfo());
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
+    RE::BSTSmartPointer<RE::BSScript::Object> objectPtrO;
+	auto TypeArgString = TypeArg.GetTypeInfo()->GetName();
     const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
-    const auto FormRef = RE::TESForm::LookupByID(Playerform);
-	const auto FormVmType = static_cast<RE::VMTypeID>(FormRef->GetFormType());
-    impvm->GetScriptObjectType(FormVmType,classPtr);
+    const auto FormRef = RE::TESForm::LookupByID(Playerform)->AsReference();
     const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
-    impvm->FindBoundObject(ObjectVmHandle, classPtr->GetName(), objectPtr);
-	myObject = objectPtr;
+    impvm->FindBoundObject(ObjectVmHandle, TypeArgString, objectPtr);
+	impvm->CastObject(objectPtr,classPtr,objectPtrO);
+	myObject = objectPtrO;
 }
