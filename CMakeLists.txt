@@ -105,8 +105,8 @@ source_group(
 	TREE
 		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
-		${SOURCES}
 		${HEADERS}
+		${SOURCES}
 )
 
 source_group(
@@ -122,6 +122,7 @@ add_library(
 	${PROJECT_NAME}
 	SHARED
 	${SOURCES}
+	${HEADERS}
 	${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
