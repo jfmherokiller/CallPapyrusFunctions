@@ -39,7 +39,7 @@ namespace MakeFunctionArgs
                     scriptVariable.emplace();
                     auto vm = Internal::VirtualMachine::GetSingleton();
                     RE::BSTSmartPointer<RE::BSScript::Object> myOutObject;
-					StringToObject(vm,arg,myOutObject);
+					StringToObject(vm, arg, argType, myOutObject);
 					scriptVariable->SetObject(myOutObject);
                     break;
                 }

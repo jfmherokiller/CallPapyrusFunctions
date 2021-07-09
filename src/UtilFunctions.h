@@ -20,5 +20,5 @@ RE::VMHandle StringToVmHandle(RE::BSScript::Internal::VirtualMachine* impvm,cons
 	const auto ObjectVmHandle = policy->GetHandleForObject(RefTesting2->GetFormType(), RefTesting2);
 	return ObjectVmHandle;
 }
-void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm,const std::string& formHex,RE::BSTSmartPointer<RE::BSScript::Object>& myObject);
+void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& formHex, const RE::BSScript::TypeInfo& TypeArg, RE::BSTSmartPointer<RE::BSScript::Object>& myObject);
 
