@@ -23,7 +23,7 @@ namespace MakeFunctionArgs
 
             using namespace RE::BSScript;
             using RawType = TypeInfo::RawType;
-
+            using FormTypeE = RE::FormType;
             m_Variables.reserve(argTypes.size());
             for (size_t i = 0; i < args.size(); i++)
             {
@@ -31,7 +31,7 @@ namespace MakeFunctionArgs
                 const auto& argType = argTypes[i];
 
                 std::optional<Variable> scriptVariable;
-                switch (argType.GetRawType())
+                switch (argType.GetUnmangledRawType())
                 {
                 case RawType::kObject:
                 {
@@ -79,7 +79,7 @@ namespace MakeFunctionArgs
 				case RawType::kBoolArray:
 				case RawType::kArraysEnd:
 					break;
-				};
+				}
 
                 if (scriptVariable)
                 {

@@ -1,4 +1,4 @@
-﻿
+
 
 std::vector<std::string> Splitter(const std::string& basetext, const char delim)
 {
@@ -27,7 +27,8 @@ RE::BSTSmartPointer<RE::BSScript::Object> StringToObject(RE::BSScript::Internal:
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
     const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
     const auto FormRef = RE::TESForm::LookupByID<RE::TESForm>(Playerform);
-    impvm->GetScriptObjectType1(FormRef->GetName(),classPtr);
+	const auto FormVmType = static_cast<RE::VMTypeID>(FormRef->GetFormType());
+    impvm->GetScriptObjectType(FormVmType,classPtr);
     const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
     impvm->FindBoundObject(ObjectVmHandle, classPtr->GetName(), objectPtr);
     return objectPtr;
