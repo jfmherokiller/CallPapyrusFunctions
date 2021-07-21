@@ -82,20 +82,22 @@ void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aa
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
-void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* aaa,RE::BSFixedString Instance, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
-
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-	//grab form from vector
-	const auto ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, functionArgs.front());
-	functionArgs.erase(functionArgs.begin());
+	auto actualInststring = RemoveDoubleQuoteChars(Instance);
+
+	const auto ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, actualInststring);
+
 	const auto globalFunct = GetMemberFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
-	impvm->DispatchMethodCall(ObjectVmHandle, globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
+	auto classname = globalFunct->func->GetObjectTypeName();
+	auto functionname = globalFunct->func->GetName();
+	impvm->DispatchMethodCall(ObjectVmHandle, classname, functionname, functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }

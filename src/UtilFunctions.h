@@ -4,6 +4,8 @@
 
 #pragma once
 extern std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,char splitterchar);
+extern std::string RemoveDoubleQuoteChars(const RE::BSFixedString& input);
+
 template <typename T>
 T* StringToForm(const std::string& formHex)
 {
