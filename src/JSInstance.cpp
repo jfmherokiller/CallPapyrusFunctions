@@ -28,27 +28,7 @@ globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vec
 	}
 	return nullptr;
 }
-MemberFunctInfoPtr myJSInstance::GetMemberFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
-{
-	for (const auto& object_type : impvm->objectTypeMap) {
-		auto ClassName = classfunctSplitParts.at(0);
-		auto FunctionName = classfunctSplitParts.at(1);
-        auto ObjectClassName = std::string(object_type.first.c_str());
-        if ((ObjectClassName == ClassName) || ObjectClassName.starts_with(ClassName)) {
-			auto objectInfo = object_type.second;
-			for (std::uint32_t index = 0; index < objectInfo->GetNumMemberFuncs(); ++index) {
-				const auto globalFunct = objectInfo->GetMemberFuncIter() + index;
-				const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
-                if ((FunctionName == globalFunctName) || (globalFunctName.starts_with(FunctionName))) {
-					if (globalFunct->func->GetParamCount() == numArgs) {
-						return globalFunct;
-					}
-				}
-			}
-		}
-	}
-	return nullptr;
-}
+
 std::vector<RE::BSScript::TypeInfo> getFunctArgsBody(const RE::BSTSmartPointer<RE::BSScript::IFunction>& innerFunct)
 {
     std::vector<RE::BSScript::TypeInfo> ParamData;
@@ -104,4 +84,17 @@ void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* 
 	auto functionname = globalFunct->func->GetName();
 	impvm->DispatchMethodCall(ObjectVmHandle, classname, functionname, functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
+}
+MemberFunctInfoPtr myJSInstance::GetMemberFunctionT(RE::BSScript::ObjectTypeInfo* pInfo, const std::string& FunctionPart, uint32_t NumerOfArgs)
+{
+    for (std::uint32_t index = 0; index < pInfo->GetNumMemberFuncs(); ++index) {
+        const auto globalFunct = pInfo->GetMemberFuncIter() + index;
+        const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
+        if ((FunctionPart == globalFunctName) || (globalFunctName.starts_with(FunctionPart))) {
+            if (globalFunct->func->GetParamCount() == NumerOfArgs) {
+                return globalFunct;
+            }
+        }
+    }
+	return nullptr;
 }
