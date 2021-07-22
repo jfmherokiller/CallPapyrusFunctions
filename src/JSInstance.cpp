@@ -12,11 +12,13 @@ globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vec
 	for (const auto& object_type : impvm->objectTypeMap) {
         auto ClassName = classfunctSplitParts.at(0);
         auto FunctionName = classfunctSplitParts.at(1);
-		if (strcmp(object_type.first.c_str(),ClassName.c_str()) == 0) {
+		auto ObjectClassName = std::string(object_type.first.c_str());
+		if ((ObjectClassName == ClassName) || ObjectClassName.starts_with(ClassName)) {
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index) {
 				const auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
-				if (strcmp(globalFunct->func->GetName().c_str(), FunctionName.c_str()) == 0) {
+				const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
+				if ((FunctionName == globalFunctName) || (globalFunctName.starts_with(FunctionName))) {
 					if (globalFunct->func->GetParamCount() == numArgs) {
 						return globalFunct;
 					}
@@ -31,11 +33,13 @@ MemberFunctInfoPtr myJSInstance::GetMemberFunction(BSScriptVmPtr impvm, std::vec
 	for (const auto& object_type : impvm->objectTypeMap) {
 		auto ClassName = classfunctSplitParts.at(0);
 		auto FunctionName = classfunctSplitParts.at(1);
-		if (strcmp(object_type.first.c_str(), ClassName.c_str()) == 0) {
+        auto ObjectClassName = std::string(object_type.first.c_str());
+        if ((ObjectClassName == ClassName) || ObjectClassName.starts_with(ClassName)) {
 			auto objectInfo = object_type.second;
 			for (std::uint32_t index = 0; index < objectInfo->GetNumMemberFuncs(); ++index) {
 				const auto globalFunct = objectInfo->GetMemberFuncIter() + index;
-				if (strcmp(globalFunct->func->GetName().c_str(), FunctionName.c_str()) == 0) {
+				const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
+                if ((FunctionName == globalFunctName) || (globalFunctName.starts_with(FunctionName))) {
 					if (globalFunct->func->GetParamCount() == numArgs) {
 						return globalFunct;
 					}
