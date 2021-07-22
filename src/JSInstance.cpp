@@ -73,18 +73,10 @@ void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* 
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto actualInststring = RemoveDoubleQuoteChars(Instance);
 	auto ClassNamePart = boost::algorithm::to_lower_copy(classfunctSplitParts.at(0));
-	RE::BSScript::ObjectTypeInfo* FoundType = nullptr;
+
 	RE::VMHandle ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, actualInststring);
-	for (const auto& item : impvm->attachedScripts) {
-		if(item.first == ObjectVmHandle) {
-			for (const auto& itemtwo : item.second) {
-				auto ScriptName = boost::algorithm::to_lower_copy(std::string(itemtwo->GetTypeInfo()->GetName()));
-				if((ClassNamePart == ScriptName)|| (ScriptName.starts_with(ClassNamePart))) {
-					FoundType = itemtwo->GetTypeInfo();
-				}
-			}
-		}
-	}
+	const auto mattached_scripts = GetAttachedScriptsFromVmHandle(impvm,ObjectVmHandle);
+	const RE::BSScript::ObjectTypeInfo* FoundType = getDesiredTypeInfoFromScripts(ClassNamePart,mattached_scripts);
 	const auto globalFunct = GetMemberFunctionT(FoundType, classfunctSplitParts.at(1), static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
@@ -95,7 +87,9 @@ void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* 
 	impvm->DispatchMethodCall(ObjectVmHandle, classname, functionname, functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
-MemberFunctInfoPtr myJSInstance::GetMemberFunctionT(RE::BSScript::ObjectTypeInfo* pInfo, const std::string& FunctionPart, uint32_t NumerOfArgs)
+
+
+MemberFunctInfoPtr myJSInstance::GetMemberFunctionT(const RE::BSScript::ObjectTypeInfo* pInfo, const std::string& FunctionPart, uint32_t NumerOfArgs)
 {
     for (std::uint32_t index = 0; index < pInfo->GetNumMemberFuncs(); ++index) {
         const auto globalFunct = pInfo->GetMemberFuncIter() + index;

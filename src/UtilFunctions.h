@@ -23,4 +23,24 @@ RE::VMHandle StringToVmHandle(RE::BSScript::Internal::VirtualMachine* impvm,cons
 	return ObjectVmHandle;
 }
 void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& formHex, const RE::BSScript::TypeInfo& TypeArg, RE::BSTSmartPointer<RE::BSScript::Object>& myObject);
-
+inline const RE::BSScript::ObjectTypeInfo* getDesiredTypeInfoFromScripts(const std::string& ClassNamePart, const RE::BSTSmallSharedArray<RE::BSScript::Internal::AttachedScript>* mattached_scripts)
+{
+    RE::BSScript::ObjectTypeInfo* FoundType = nullptr;
+    for (const auto& script : *mattached_scripts) {
+        auto ScriptName = boost::algorithm::to_lower_copy(std::string(script->GetTypeInfo()->GetName()));
+        if ((ClassNamePart == ScriptName) || (ScriptName.starts_with(ClassNamePart))) {
+            FoundType = script->GetTypeInfo();
+        }
+    }
+    return FoundType;
+}
+inline const RE::BSTSmallSharedArray<RE::BSScript::Internal::AttachedScript>* GetAttachedScriptsFromVmHandle(RE::BSScript::Internal::VirtualMachine* impvm, RE::VMHandle ObjectVmHandle)
+{
+    const RE::BSTSmallSharedArray<RE::BSScript::Internal::AttachedScript>* FoundType = nullptr;
+    for (const auto& item : impvm->attachedScripts) {
+        if(item.first == ObjectVmHandle) {
+            FoundType = &item.second;
+        }
+    }
+    return FoundType;
+}
