@@ -9,6 +9,7 @@
     "boost-stl-interfaces",
     "span-lite",
     "spdlog",
-    "boost-stl-interfaces"
+    "boost-stl-interfaces",
+    "boost-algorithm"
   ]
 }
