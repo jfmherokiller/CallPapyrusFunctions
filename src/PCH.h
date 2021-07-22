@@ -1,11 +1,11 @@
 #pragma once
-
+#include <boost/algorithm/string.hpp>
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 #include "PluginsFuncts.h"
 #include "UtilFunctions.h"
 #include "NewTypeHandling.hpp"
-#include <boost/algorithm/string.hpp>
+
 #pragma warning(push)
 #ifdef NDEBUG
 #	include <spdlog/sinks/basic_file_sink.h>
