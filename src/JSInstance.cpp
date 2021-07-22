@@ -72,10 +72,19 @@ void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* 
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto actualInststring = RemoveDoubleQuoteChars(Instance);
-
-	const auto ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, actualInststring);
-
-	const auto globalFunct = GetMemberFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
+	RE::BSScript::ObjectTypeInfo* FoundType = nullptr;
+	RE::VMHandle ObjectVmHandle = StringToVmHandle<RE::TESForm>(impvm, actualInststring);
+	for (const auto& item : impvm->attachedScripts) {
+		if(item.first == ObjectVmHandle) {
+			for (const auto& itemtwo : item.second) {
+				auto ScriptName = boost::algorithm::to_lower_copy(std::string(itemtwo->GetTypeInfo()->GetName()));
+				if((ClassNamePart == ScriptName)|| (ScriptName.starts_with(ClassNamePart))) {
+					FoundType = itemtwo->GetTypeInfo();
+				}
+			}
+		}
+	}
+	const auto globalFunct = GetMemberFunctionT(FoundType, FunctionNamePart, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
