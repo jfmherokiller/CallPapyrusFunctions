@@ -5,6 +5,7 @@
 #include "PluginsFuncts.h"
 #include "UtilFunctions.h"
 #include "NewTypeHandling.hpp"
+#include <boost/algorithm/string.hpp>
 #pragma warning(push)
 #ifdef NDEBUG
 #	include <spdlog/sinks/basic_file_sink.h>
