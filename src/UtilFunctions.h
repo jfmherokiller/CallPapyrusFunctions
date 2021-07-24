@@ -44,3 +44,4 @@ inline const RE::BSTSmallSharedArray<RE::BSScript::Internal::AttachedScript>* Ge
     }
     return FoundType;
 }
+RE::VMTypeID StringToVmType(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& TypeName);

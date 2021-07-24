@@ -35,3 +35,13 @@ void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::st
 	impvm->CastObject(objectPtr,classPtr,objectPtrO);
 	myObject = objectPtrO;
 }
+RE::VMTypeID StringToVmType(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& TypeName) {
+	auto SpecialName = RE::BSFixedString(TypeName);
+	RE::VMTypeID FoundType = 0;
+    for (const auto& item : impvm->objectTypeToTypeID) {
+        if(item.first == SpecialName) {
+            FoundType = item.second;
+        }
+    }
+	return FoundType;
+}
