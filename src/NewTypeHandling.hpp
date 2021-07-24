@@ -37,9 +37,8 @@ namespace MakeFunctionArgs
                 {
                     // TODO
                     scriptVariable.emplace();
-                    auto vm = Internal::VirtualMachine::GetSingleton();
 					auto form = StringToForm<RE::TESForm>(arg);
-					auto vmtype = StringToVmType(vm,argType.GetTypeInfo()->GetName());
+					auto vmtype = StringToVmType(argType.GetTypeInfo()->GetName());
 					PackHandle(scriptVariable.operator->(),form,vmtype);
                     break;
                 }

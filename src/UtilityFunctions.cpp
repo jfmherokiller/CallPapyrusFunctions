@@ -31,16 +31,17 @@ void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::st
 	auto TypeArgString = TypeArg.GetTypeInfo()->GetName();
     const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
     const auto FormRef = RE::TESForm::LookupByID(Playerform)->AsReference();
-	const auto TheVmType = StringToVmType(impvm,TypeArgString);
+	const auto TheVmType = StringToVmType(TypeArgString);
     const auto ObjectVmHandle = policy->GetHandleForObject(TheVmType, FormRef);
     impvm->FindBoundObject(ObjectVmHandle, TypeArgString, objectPtr);
 	impvm->CastObject(objectPtr,classPtr,objectPtrO);
 	myObject = objectPtrO;
 }
-RE::VMTypeID StringToVmType(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& TypeName) {
+RE::VMTypeID StringToVmType(const std::string& TypeName) {
+    auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
 	auto SpecialName = RE::BSFixedString(TypeName);
 	RE::VMTypeID FoundType = 0;
-    for (const auto& item : impvm->objectTypeToTypeID) {
+    for (const auto& item : vm->objectTypeToTypeID) {
         if(item.first == SpecialName) {
             FoundType = item.second;
         }
