@@ -24,13 +24,15 @@ std::vector<std::string> RemoveQuotesAndSplit(const RE::BSFixedString& input,cha
 void StringToObject(RE::BSScript::Internal::VirtualMachine* impvm, const std::string& formHex,const RE::BSScript::TypeInfo& TypeArg, RE::BSTSmartPointer<RE::BSScript::Object>& myObject)
 {
     auto policy = impvm->GetObjectHandlePolicy();
-    auto classPtr = RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> (TypeArg.GetTypeInfo());
+    RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> classPtr;
+	impvm->GetScriptObjectType1(TypeArg.GetTypeInfo()->GetName(),classPtr);
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtr;
     RE::BSTSmartPointer<RE::BSScript::Object> objectPtrO;
 	auto TypeArgString = TypeArg.GetTypeInfo()->GetName();
     const RE::FormID Playerform = std::strtoul(formHex.c_str(), nullptr, 16);
     const auto FormRef = RE::TESForm::LookupByID(Playerform)->AsReference();
-    const auto ObjectVmHandle = policy->GetHandleForObject(FormRef->GetFormType(), FormRef);
+	const auto TheVmType = StringToVmType(impvm,TypeArgString);
+    const auto ObjectVmHandle = policy->GetHandleForObject(TheVmType, FormRef);
     impvm->FindBoundObject(ObjectVmHandle, TypeArgString, objectPtr);
 	impvm->CastObject(objectPtr,classPtr,objectPtrO);
 	myObject = objectPtrO;

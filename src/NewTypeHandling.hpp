@@ -38,9 +38,9 @@ namespace MakeFunctionArgs
                     // TODO
                     scriptVariable.emplace();
                     auto vm = Internal::VirtualMachine::GetSingleton();
-                    RE::BSTSmartPointer<RE::BSScript::Object> myOutObject;
-					StringToObject(vm, arg, argType, myOutObject);
-					scriptVariable->SetObject(myOutObject);
+					auto form = StringToForm<RE::TESForm>(arg);
+					auto vmtype = StringToVmType(vm,argType.GetTypeInfo()->GetName());
+					PackHandle(scriptVariable.operator->(),form,vmtype);
                     break;
                 }
                 case RawType::kString:
