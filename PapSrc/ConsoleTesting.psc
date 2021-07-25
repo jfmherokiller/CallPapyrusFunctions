@@ -35,7 +35,9 @@ Bool Function ChoseCommandTable(string[] cmd)
 		Debug.Notification("This is version 1.0!")
 		bSuccess=true
 	ElseIf(cmd[0] == "cgfm")
-		MyPluginScript.CallGlobalFunction(cmd[1],cmd[2])
+		CallGlobalFuncts.CallGlobalFunction(cmd[1],cmd[2])
+	ElseIf(cmd[0] == "cifm")
+		CallGlobalFuncts.CallInstanceFunction(cmd[1],cmd[2],cmd[3])
 	endif
 	return bSuccess
 	

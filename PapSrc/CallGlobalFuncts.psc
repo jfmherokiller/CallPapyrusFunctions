@@ -1,4 +1,4 @@
 scriptName CallGlobalFuncts Hidden
 
 Function CallGlobalFunction(string ClassFunctName,string ArgListString) global native
-Function CallInstanceFunction(string ClassFunctName,string ArgListString) global native
+Function CallInstanceFunction(string instance,string ClassFunctName,string ArgListString) global native
