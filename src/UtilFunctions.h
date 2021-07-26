@@ -45,3 +45,11 @@ inline const RE::BSTSmallSharedArray<RE::BSScript::Internal::AttachedScript>* Ge
     return FoundType;
 }
 RE::VMTypeID StringToVmType(const std::string& TypeName);
+
+template <class F>
+void call_async(F&& fun) {
+    auto futptr = std::make_shared<std::future<void>>();
+    *futptr = std::async(std::launch::async, [futptr, fun]() {
+      fun();
+    });
+}

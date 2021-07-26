@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/algorithm/string.hpp>
+#include <future>
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 #include "PluginsFuncts.h"
