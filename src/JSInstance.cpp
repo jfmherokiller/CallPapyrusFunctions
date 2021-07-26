@@ -2,8 +2,11 @@ myJSInstance::myJSInstance() = default;
 
 bool myJSInstance::RegisterFuncts(BSScriptVmPtr a_registry)
 {
-	a_registry->RegisterFunction("CallGlobalFunction", "CallGlobalFuncts", CallGlobalFunction);
-	a_registry->RegisterFunction("CallInstanceFunction", "CallGlobalFuncts", CallInstanceFunction);
+	auto Classname = "CallGlobalFuncts";
+	a_registry->RegisterFunction("CallGlobalFunction", Classname, CallGlobalFunction);
+	a_registry->RegisterFunction("CallInstanceFunction", Classname, CallInstanceFunction);
+	a_registry->RegisterFunction("CallGlobalFunctionAsync",Classname, CallGlobalFunctionAsync);
+	a_registry->RegisterFunction("CallInstanceFunctionAsync",Classname, CallInstanceFunctionAsync);
 	return true;
 }
 
@@ -54,6 +57,12 @@ RE::BSScript::IFunctionArguments* ConvertArgs(T* globalFunct, std::vector<std::s
 	return MakeFunctionArgs::getArgumentsBody(args, argvals);
 }
 //these are the functions passed to the papyrus engine
+void myJSInstance::CallGlobalFunctionAsync([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+{
+	call_async([=] {
+		myJSInstance::CallGlobalFunction(aaa, classfunct, arglist);
+	});
+}
 void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
@@ -66,7 +75,13 @@ void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aa
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
 }
-void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* aaa,RE::BSFixedString Instance, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+void myJSInstance::CallInstanceFunctionAsync([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString Instance, RE::BSFixedString classfunct, RE::BSFixedString arglist)
+{
+	call_async([=] {
+		CallInstanceFunction(aaa, Instance, classfunct, arglist);
+	});
+}
+void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString Instance, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
