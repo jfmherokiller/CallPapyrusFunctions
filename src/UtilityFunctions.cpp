@@ -48,3 +48,15 @@ RE::VMTypeID StringToVmType(const std::string& TypeName) {
     }
 	return FoundType;
 }
+RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> GetClassFromName(const std::string& classPart)
+{
+    auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
+    for (const auto& object_type : impvm->objectTypeMap) {
+        auto ObjectClassName = std::string(object_type.first.c_str());
+        if ((ObjectClassName == classPart) || ObjectClassName.starts_with(classPart)) {
+            auto objectInfo = object_type.second;
+            return objectInfo;
+        }
+    }
+    return nullptr;
+}

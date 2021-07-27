@@ -53,3 +53,4 @@ void call_async(F&& fun) {
       fun();
     });
 }
+RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> GetClassFromName(const std::string& classPart);

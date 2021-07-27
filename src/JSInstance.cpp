@@ -10,25 +10,37 @@ bool myJSInstance::RegisterFuncts(BSScriptVmPtr a_registry)
 	return true;
 }
 
-globalFunctInfoPtr myJSInstance::GetGlobalFunction(BSScriptVmPtr impvm, std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
+MemberFunctInfoPtr myJSInstance::GetMemberFunctionT(const RE::BSScript::ObjectTypeInfo* pInfo, const std::string& FunctionPart, uint32_t NumerOfArgs)
 {
-	for (const auto& object_type : impvm->objectTypeMap) {
-        auto ClassName = classfunctSplitParts.at(0);
-        auto FunctionName = classfunctSplitParts.at(1);
-		auto ObjectClassName = std::string(object_type.first.c_str());
-		if ((ObjectClassName == ClassName) || ObjectClassName.starts_with(ClassName)) {
-			auto objectInfo = object_type.second;
-			for (std::uint32_t index = 0; index < objectInfo->GetNumGlobalFuncs(); ++index) {
-				const auto globalFunct = objectInfo->GetGlobalFuncIter() + index;
-				const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
-				if ((FunctionName == globalFunctName) || (globalFunctName.starts_with(FunctionName))) {
-					if (globalFunct->func->GetParamCount() == numArgs) {
-						return globalFunct;
-					}
-				}
-			}
-		}
+    for (std::uint32_t index = 0; index < pInfo->GetNumMemberFuncs(); ++index) {
+        const auto globalFunct = pInfo->GetMemberFuncIter() + index;
+        const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
+        if ((FunctionPart == globalFunctName) || (globalFunctName.starts_with(FunctionPart))) {
+            if (globalFunct->func->GetParamCount() == NumerOfArgs) {
+                return globalFunct;
+            }
+        }
+    }
+    return nullptr;
+}
+
+globalFunctInfoPtr myJSInstance::GetGlobalFunction(std::vector<std::string> classfunctSplitParts, std::uint32_t numArgs)
+{
+    auto ClassName = classfunctSplitParts.at(0);
+    auto FunctionName = classfunctSplitParts.at(1);
+	auto calculatedClass = GetClassFromName(ClassName);
+	if(calculatedClass == nullptr) {
+		return nullptr;
 	}
+    for (std::uint32_t index = 0; index < calculatedClass->GetNumGlobalFuncs(); ++index) {
+        const auto globalFunct = calculatedClass->GetGlobalFuncIter() + index;
+        const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
+        if ((FunctionName == globalFunctName) || (globalFunctName.starts_with(FunctionName))) {
+            if (globalFunct->func->GetParamCount() == numArgs) {
+                return globalFunct;
+            }
+        }
+    }
 	return nullptr;
 }
 
@@ -43,6 +55,7 @@ std::vector<RE::BSScript::TypeInfo> getFunctArgsBody(const RE::BSTSmartPointer<R
     }
     return ParamData;
 }
+
 template <class T>
 std::vector<RE::BSScript::TypeInfo> GetFunctArgs(T* globalFunct)
 {
@@ -63,14 +76,16 @@ void myJSInstance::CallGlobalFunctionAsync([[maybe_unused]] RE::StaticFunctionTa
 		myJSInstance::CallGlobalFunction(aaa, classfunct, arglist);
 	});
 }
+
 void myJSInstance::CallGlobalFunction([[maybe_unused]] RE::StaticFunctionTag* aaa, RE::BSFixedString classfunct, RE::BSFixedString arglist)
 {
 	std::vector<std::string> classfunctSplitParts = RemoveQuotesAndSplit(classfunct, '.');
 	std::vector<std::string> functionArgs = RemoveQuotesAndSplit(arglist, ',');
 	auto impvm = RE::BSScript::Internal::VirtualMachine::GetSingleton();
-	const auto globalFunct = GetGlobalFunction(impvm, classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
+	const auto globalFunct = GetGlobalFunction( classfunctSplitParts, static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
+
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
@@ -95,25 +110,11 @@ void myJSInstance::CallInstanceFunction([[maybe_unused]] RE::StaticFunctionTag* 
 	const auto globalFunct = GetMemberFunctionT(FoundType, classfunctSplitParts.at(1), static_cast<std::uint32_t>(functionArgs.size()));
 	if (globalFunct == nullptr)
 		return;
+
 	const auto functargs = ConvertArgs(globalFunct, functionArgs);
 	RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> aaaclass;
 	auto classname = globalFunct->func->GetObjectTypeName();
 	auto functionname = globalFunct->func->GetName();
 	impvm->DispatchMethodCall(ObjectVmHandle, classname, functionname, functargs, aaaclass);
 	//impvm->DispatchStaticCall(globalFunct->func->GetObjectTypeName(), globalFunct->func->GetName(), functargs, aaaclass);
-}
-
-
-MemberFunctInfoPtr myJSInstance::GetMemberFunctionT(const RE::BSScript::ObjectTypeInfo* pInfo, const std::string& FunctionPart, uint32_t NumerOfArgs)
-{
-    for (std::uint32_t index = 0; index < pInfo->GetNumMemberFuncs(); ++index) {
-        const auto globalFunct = pInfo->GetMemberFuncIter() + index;
-        const auto globalFunctName = std::string(globalFunct->func->GetName().c_str());
-        if ((FunctionPart == globalFunctName) || (globalFunctName.starts_with(FunctionPart))) {
-            if (globalFunct->func->GetParamCount() == NumerOfArgs) {
-                return globalFunct;
-            }
-        }
-    }
-	return nullptr;
 }
