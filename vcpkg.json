@@ -10,6 +10,7 @@
     "span-lite",
     "spdlog",
     "boost-stl-interfaces",
-    "boost-algorithm"
+    "boost-algorithm",
+    "xbyak"
   ]
 }
