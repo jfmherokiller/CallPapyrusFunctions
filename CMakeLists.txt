@@ -227,3 +227,5 @@ if (COPY_BUILD)
 endif ()
 
 set(VS_STARTUP_PROJECT CallPaparusFunctions)
+
+install(TARGETS CallPaparusFunctions)
