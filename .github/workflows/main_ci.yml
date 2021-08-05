@@ -5,7 +5,7 @@ on: [push, pull_request]
 env:
   CMAKE_VERSION: 3.21.1
   NINJA_VERSION: 1.10.2
-  BUILD_TYPE: Debug
+  BUILD_TYPE: Release
   CCACHE_VERSION: 4.2.1
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 

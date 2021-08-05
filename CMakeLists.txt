@@ -155,7 +155,6 @@ if (MSVC)
 		${PROJECT_NAME}
 		PRIVATE
 
-			/wd4099 # Disable warning
 			/sdl	# Enable Additional Security Checks
 			/utf-8	# Set Source and Executable character sets to UTF-8
 			/Zi	# Debug Information Format
