@@ -196,8 +196,8 @@ if (MSVC)
 	target_link_options(
 		${PROJECT_NAME}
 		PRIVATE
+			/wd4099 #Disable this fuq warning
 			/WX	# Treat Linker Warnings as Errors
-
 			"$<$<CONFIG:DEBUG>:/INCREMENTAL;/OPT:NOREF;/OPT:NOICF>"
 			"$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
 	)
