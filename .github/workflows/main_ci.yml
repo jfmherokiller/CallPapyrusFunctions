@@ -174,7 +174,7 @@ jobs:
           execute_process(COMMAND ccache -z)
 
           execute_process(
-            COMMAND cmake --build build
+            COMMAND cmake --build build --config ${{ env.BUILD_TYPE }}
             RESULT_VARIABLE result
             OUTPUT_VARIABLE output
             ERROR_VARIABLE output
