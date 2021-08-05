@@ -1,4 +1,4 @@
-name: Main CI
+name: CMake Build Matrix
 
 on:
   push:
@@ -16,16 +16,89 @@ on:
   workflow_dispatch:
 
 env:
+  CMAKE_VERSION: 3.21.1
+  NINJA_VERSION: 1.10.2
   BUILD_TYPE: Debug
+  CCACHE_VERSION: 4.2.1
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 
 jobs:
-  windows:
-    runs-on: windows-latest
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+            name: "Windows Latest MSVC", artifact: "Windows-MSVC.7z",
+            os: windows-latest,
+            cc: "cl", cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          }
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
+
+      - name: Download Ninja and CMake
+        shell: cmake -P {0}
+        run: |
+          set(cmake_version $ENV{CMAKE_VERSION})
+          set(ninja_version $ENV{NINJA_VERSION})
+
+          message(STATUS "Using host CMake version: ${CMAKE_VERSION}")
+
+          if ("${{ runner.os }}" STREQUAL "Windows")
+            set(ninja_suffix "win.zip")
+            set(cmake_suffix "windows-x86_64.zip")
+            set(cmake_dir "cmake-${cmake_version}-windows-x86_64/bin")
+          endif()
+
+          set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
+          file(DOWNLOAD "${ninja_url}" ./ninja.zip SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ninja.zip)
+
+          set(cmake_url "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}")
+          file(DOWNLOAD "${cmake_url}" ./cmake.zip SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./cmake.zip)
+
+          # Add to PATH environment variable
+          file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/${cmake_dir}" cmake_dir)
+          set(path_separator ":")
+          if ("${{ runner.os }}" STREQUAL "Windows")
+            set(path_separator ";")
+          endif()
+          file(APPEND "$ENV{GITHUB_PATH}" "$ENV{GITHUB_WORKSPACE}${path_separator}${cmake_dir}")
+
+          if (NOT "${{ runner.os }}" STREQUAL "Windows")
+            execute_process(
+              COMMAND chmod +x ninja
+              COMMAND chmod +x ${cmake_dir}/cmake
+            )
+          endif()
+
+      - name: Download ccache
+        id: ccache
+        shell: cmake -P {0}
+        run: |
+          set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
+          file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+
+      - name: Prepare ccache timestamp
+        id: ccache_cache_timestamp
+        shell: cmake -P {0}
+        run: |
+          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+          message("::set-output name=timestamp::${current_date}")
+
+      - name: ccache cache files
+        uses: actions/cache@v1.1.0
         with:
-          path: main
+          path: .ccache
+          key: ${{ matrix.config.name }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            ${{ matrix.config.name }}-ccache-
 
       - name: Setup vcpkg
         run: |
@@ -43,13 +116,90 @@ jobs:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('main/**/vcpkg.json', 'vcpkg-version.txt') }}
 
-      - name: Configure CMake
-        working-directory: ${{ github.workspace }}/main
-        run: cmake --preset vs2019-windows-vcpkg
+      - name: Configure
+        shell: cmake -P {0}
+        run: |
+          set(ENV{CC} ${{ matrix.config.cc }})
+          set(ENV{CXX} ${{ matrix.config.cxx }})
+
+          if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+            execute_process(
+              COMMAND "${{ matrix.config.environment_script }}" && set
+              OUTPUT_FILE environment_script_output.txt
+            )
+            file(STRINGS environment_script_output.txt output_lines)
+            foreach(line IN LISTS output_lines)
+              if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+                set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              endif()
+            endforeach()
+          endif()
+
+          set(path_separator ":")
+          if ("${{ runner.os }}" STREQUAL "Windows")
+            set(path_separator ";")
+          endif()
+          set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+
+          execute_process(
+            COMMAND cmake
+              --preset vs2019-windows-vcpkg
+              -S .
+              -B build
+              -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+              -G Ninja
+              -D CMAKE_MAKE_PROGRAM=ninja
+              -D CMAKE_C_COMPILER_LAUNCHER=ccache
+              -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+            RESULT_VARIABLE result
+          )
+          if (NOT result EQUAL 0)
+            message(FATAL_ERROR "Bad exit status")
+          endif()
+
 
       - name: Build
-        working-directory: ${{ github.workspace }}/main
-        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+        shell: cmake -P {0}
+        run: |
+          set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
+
+          if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+            file(STRINGS environment_script_output.txt output_lines)
+            foreach(line IN LISTS output_lines)
+              if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+                set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              endif()
+            endforeach()
+          endif()
+
+          file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}" ccache_basedir)
+          set(ENV{CCACHE_BASEDIR} "${ccache_basedir}")
+          set(ENV{CCACHE_DIR} "${ccache_basedir}/.ccache")
+          set(ENV{CCACHE_COMPRESS} "true")
+          set(ENV{CCACHE_COMPRESSLEVEL} "6")
+          set(ENV{CCACHE_MAXSIZE} "400M")
+          if ("${{ matrix.config.cxx }}" STREQUAL "cl")
+            set(ENV{CCACHE_MAXSIZE} "600M")
+          endif()
+
+          execute_process(COMMAND ccache -p)
+          execute_process(COMMAND ccache -z)
+
+          execute_process(
+            COMMAND cmake --build build
+            RESULT_VARIABLE result
+            OUTPUT_VARIABLE output
+            ERROR_VARIABLE output
+            ECHO_OUTPUT_VARIABLE ECHO_ERROR_VARIABLE
+          )
+          if (NOT result EQUAL 0)
+            string(REGEX MATCH "FAILED:.*$" error_message "${output}")
+            string(REPLACE "\n" "%0A" error_message "${error_message}")
+            message("::error::${error_message}")
+            message(FATAL_ERROR "Build failed")
+          endif()
+
+          execute_process(COMMAND ccache -s)
 
       - name: Install Strip
         run: cmake --install build --prefix instdir --strip
@@ -57,18 +207,18 @@ jobs:
 
       - name: Pack
         working-directory: instdir
-        run: cmake -E tar cfv ../Windows-MSVC.7z --format=7zip .
+        run: cmake -E tar cfv ../${{ matrix.config.artifact }} --format=7zip .
 
 
       - name: Upload
         uses: actions/upload-artifact@v1
         with:
-          path: ./Windows-MSVC.7z
-          name: Windows-MSVC.7z
+          path: ./${{ matrix.config.artifact }}
+          name: ${{ matrix.config.artifact }}
 
   release:
     if: contains(github.ref, 'tags/v')
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
 
     steps:
@@ -86,6 +236,7 @@ jobs:
       - name: Store Release url
         run: |
           echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
+
       - uses: actions/upload-artifact@v1
         with:
           path: ./upload_url
@@ -103,6 +254,7 @@ jobs:
             name: "Windows Latest MSVC", artifact: "Windows-MSVC.7z",
             os: ubuntu-latest
           }
+
     needs: release
 
     steps:
@@ -121,6 +273,7 @@ jobs:
         run: |
           upload_url=`cat ./upload_url`
           echo ::set-output name=upload_url::$upload_url
+
       - name: Upload to Release
         id: upload_to_release
         uses: actions/upload-release-asset@v1.0.1
