@@ -1,0 +1,33 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  CompilePap:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout Src
+        uses: actions/checkout@v2
+
+      - name: Download PCompiler
+        id: pcompd
+        shell: cmake -P {0}
+        run: |
+          set(ccache_url "https://gateway.pinata.cloud/ipfs/QmWx5Zu6hH6CcAHsmck4uwADLBPEJtBdHodrQ55odnsM8s/Papyrus_Compiler.zip")
+          file(DOWNLOAD "${ccache_url}" ./Papyrus_Compiler.zip SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./Papyrus_Compiler.zip)
+      - name: Compile Scripts
+        id: pcomp
+        shell: cmake -P {0}
+        run: |
+          execute_process(COMMAND ${CMAKE_COMMAND} -E Papyrus_Compiler/Papyrus_Compiler.exe -f="./Papyrus_Compiler/TESV_Papyrus_Flags.flg" ./PapSrc/CallGlobalFuncts.psc)
