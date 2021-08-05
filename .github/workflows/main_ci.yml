@@ -38,7 +38,7 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Download Ninja and CMake
         shell: cmake -P {0}
@@ -93,7 +93,7 @@ jobs:
           message("::set-output name=timestamp::${current_date}")
 
       - name: ccache cache files
-        uses: actions/cache@v1.1.0
+        uses: actions/cache@v2
         with:
           path: .ccache
           key: ${{ matrix.config.name }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
@@ -211,7 +211,7 @@ jobs:
 
 
       - name: Upload
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           path: ./${{ matrix.config.artifact }}
           name: ${{ matrix.config.artifact }}
