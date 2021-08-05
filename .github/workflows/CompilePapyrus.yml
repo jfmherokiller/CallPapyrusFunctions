@@ -28,6 +28,6 @@ jobs:
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./Papyrus_Compiler.zip)
       - name: Compile Scripts
         id: pcomp
-        shell: cmake -P {0}
+        shell: pwsh
         run: |
-          execute_process(COMMAND ${CMAKE_COMMAND} -E Papyrus_Compiler/Papyrus_Compiler.exe -f="./Papyrus_Compiler/TESV_Papyrus_Flags.flg" ./PapSrc/CallGlobalFuncts.psc)
+          ./Papyrus_Compiler/Papyrus_Compiler.exe -f="./Papyrus_Compiler/TESV_Papyrus_Flags.flg" ./PapSrc/CallGlobalFuncts.psc
