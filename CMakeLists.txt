@@ -186,7 +186,7 @@ if (MSVC)
 			/external:W0
 
 			/W4	# Warning level
-			/WX	# Warning level (warnings are errors)
+			#/WX	# Warning level (warnings are errors)
 
 			"$<$<CONFIG:DEBUG>:>"
 			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
