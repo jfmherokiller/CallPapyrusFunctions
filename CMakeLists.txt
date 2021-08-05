@@ -154,6 +154,8 @@ if (MSVC)
 	target_compile_options(
 		${PROJECT_NAME}
 		PRIVATE
+
+			/wd4099 # Disable warning
 			/sdl	# Enable Additional Security Checks
 			/utf-8	# Set Source and Executable character sets to UTF-8
 			/Zi	# Debug Information Format
@@ -186,7 +188,7 @@ if (MSVC)
 			/external:W0
 
 			/W4	# Warning level
-			#/WX	# Warning level (warnings are errors)
+			/WX	# Warning level (warnings are errors)
 
 			"$<$<CONFIG:DEBUG>:>"
 			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
