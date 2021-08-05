@@ -1,19 +1,6 @@
 name: CMake Build Matrix
 
-on:
-  push:
-    branches: [ master ]
-    paths:
-      - '.github/workflows/main_ci.yml'
-      - 'cmake/**'
-      - 'include/**'
-      - 'src/**'
-      - 'CMakeLists.txt'
-      - 'CMakePresets.json'
-      - 'vcpkg.json'
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 env:
   CMAKE_VERSION: 3.21.1
