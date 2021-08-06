@@ -28,7 +28,7 @@ jobs:
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./Papyrus_Compiler.zip)
 
       - name: Make OutFolder
-        id:outfolder
+        id: outfolder
         shell: cmake -P {0}
         run: |
           execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory OutFolder)
