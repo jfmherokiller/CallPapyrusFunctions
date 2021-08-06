@@ -26,8 +26,13 @@ jobs:
           set(ccache_url "https://gateway.pinata.cloud/ipfs/QmWx5Zu6hH6CcAHsmck4uwADLBPEJtBdHodrQ55odnsM8s/Papyrus_Compiler.zip")
           file(DOWNLOAD "${ccache_url}" ./Papyrus_Compiler.zip SHOW_PROGRESS)
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./Papyrus_Compiler.zip)
+      - name: Make OutFolder
+        id:outfolder
+        shell: cmake -P {0}
+        run: |
+          execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory OutFolder)
       - name: Compile Scripts
         id: pcomp
         shell: pwsh
         run: |
-          .\Papyrus_Compiler\PapyrusCompiler.exe .\PapSrc\ -all -f=".\Papyrus_Compiler\TESV_Papyrus_Flags.flg"
+          .\Papyrus_Compiler\PapyrusCompiler.exe .\PapSrc\ -all -f=".\Papyrus_Compiler\TESV_Papyrus_Flags.flg" -o=".\OutFolder"
