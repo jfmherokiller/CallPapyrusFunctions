@@ -30,4 +30,4 @@ jobs:
         id: pcomp
         shell: pwsh
         run: |
-          .\Papyrus_Compiler\PapyrusCompiler.exe .\PapSrc\CallGlobalFuncts -f=".\Papyrus_Compiler\TESV_Papyrus_Flags.flg"
+          .\Papyrus_Compiler\PapyrusCompiler.exe .\PapSrc\ -all -f=".\Papyrus_Compiler\TESV_Papyrus_Flags.flg"
